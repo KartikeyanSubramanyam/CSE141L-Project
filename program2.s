@@ -8,6 +8,12 @@ Bit XOR with rX:0 and rY:0
 Bit XOR with rX:0 and rY:1
 Bit XOR with rX:0 and rY:2
 
+XOR 0 2 # rX:0^rY:2
+MOV 0 2 # rX:0 <- rY:2
+mov rX, r1
+mov rY, rX
+mov r1, rY
+
 // p4
 Bit XOR with rX:1 and rY:0
 Bit XOR with rX:1 and rY:1
