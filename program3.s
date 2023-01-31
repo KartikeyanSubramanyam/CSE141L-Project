@@ -1,65 +1,151 @@
+$main:
+        lb      32          # loads mem[32] into rM
+        nop
+        mov     rX,rM       # moves rM to rX
+        li      3           # loads 3 into rM
+        mov     rY,rM       # moves rM to rY
+        sra     3           # rZ = rX >> rY
 
+        # stack stuff - keeping just to see if we need
+        ; mov     rM,rZ       # rM -> rZ
+        ; sb      rM,36($fp)
+        ; sw      $0,8($fp)
+        ; sw      $0,12($fp)
+        ; sw      $0,16($fp)
+        ; sw      $0,20($fp)
+        ; b       $line_33b
+        ; nop
 
-# Load mem[32]
-ldb rM, mem[32]
-# Move rM to rX
-mov rM, rX
+$line_10:
+        ; sw      $0,24($fp)
+        li      3
+        mov     rY,rM
+        ; sw      $2,28($fp)
+        b       $line_19
+        nop
 
-# Loop
+$line_13:
+        ; lw      $2,20($fp)
+        addiu   $3,$fp,8
+        addu    $2,$3,$2
+        ; lb      $2,36($2)
+        nop
+        move    $3,$2
+        ; lw      $2,28($fp)
+        nop
+        sra     $2,$3,$2
+        ; sb      $2,40($fp)
+        ; lb      $3,40($fp)
+        ; lb      $2,36($fp)
+        nop
+        bne     $3,$2,$line_12
+        nop
 
-# Load mem[0]
-ldb rM, mem[0]
-# Move rM to rY
-mov rM, rY
-# XOR rX and rY -> rZ
-xor
-# 
+        ; lw      $2,8($fp)
+        nop
+        addiu   $2,$2,1
+        ; sw      $2,8($fp)
+        ; lw      $2,16($fp)
+        nop
+        addiu   $2,$2,1
+        ; sw      $2,16($fp)
+        li      $2,1                        # 0x1
+        ; sw      $2,24($fp)
+$line_12:
+        ; lw      $2,28($fp)
+        nop
+        addiu   $2,$2,1
+        ; sw      $2,28($fp)
+$line_19:
+        ; lw      $2,28($fp)
+        nop
+        bgez    $2,$line_13
+        nop
 
-r2 - 00000000
+        lw      $2,24($fp)
+        nop
+        beq     $2,$0,$line_23
+        nop
 
-11101000 rX
-01011101 rY
+        lw      $2,12($fp)
+        nop
+        addiu   $2,$2,1
+        sw      $2,12($fp)
+$line_23:
+        lw      $2,20($fp)
+        nop
+        slt     $2,$2,31
+        beq     $2,$0,$line_33
+        nop
 
+        li      $2,1                        # 0x1
+        sw      $2,32($fp)
+        b       $line_31
+        nop
 
+$line_25:
+        lw      $2,20($fp)
+        addiu   $3,$fp,8
+        addu    $2,$3,$2
+        lb      $2,36($2)
+        nop
+        move    $3,$2
+        lw      $2,32($fp)
+        nop
+        sll     $2,$3,$2
+        sb      $2,37($fp)
+        lw      $2,20($fp)
+        nop
+        addiu   $2,$2,1
+        addiu   $3,$fp,8
+        addu    $2,$3,$2
+        lb      $2,36($2)
+        nop
+        move    $4,$2
+        li      $3,8                        # 0x8
+        lw      $2,32($fp)
+        nop
+        subu    $2,$3,$2
+        sra     $2,$4,$2
+        sb      $2,38($fp)
+        lbu     $3,37($fp)
+        lbu     $2,38($fp)
+        nop
+        or      $2,$3,$2
+        sll     $2,$2,24
+        sra     $2,$2,24
+        andi    $2,$2,0x1f
+        sb      $2,39($fp)
+        lb      $3,39($fp)
+        lb      $2,36($fp)
+        nop
+        bne     $3,$2,$line_24
+        nop
 
-10110101 rZ
-move rZ to r3
-right shift rZ by 3 bits
-00010110
-is it not equal to 0 (is there a 1 in the bits)
-branch to special code to increase the counter (add)
+        lw      $2,16($fp)
+        nop
+        addiu   $2,$2,1
+        sw      $2,16($fp)
+$line_24:
+        lw      $2,32($fp)
+        nop
+        addiu   $2,$2,1
+        sw      $2,32($fp)
+$line_31:
+        lw      $2,32($fp)
+        nop
+        slt     $2,$2,5
+        bne     $2,$0,$line_25
+        nop
 
-Load the next byte
-Left shift rY by 1 bit: rY 10111010
-
-Counter through bits increment to 1 : shifter
-Loop this 1 time
-
-rY: 11101000
-Load mem[1] : 01011010
-Right shift new copy of mem[1] by [shifter] bits : 00000010
-Orr with rY : 11101010
-
-Continue for 1 bits
-
-Left shift new copy of mem[1] by 3 bits : 11010000
-Right shift copy of mem[1] by 5 bits : 00000110
-Orr with rY : 
-
-
-a, b)
-
-rX : 
-rY :
-r0 : counting number of occurrences of pattern in the bytes (no overlap)
-r1 : counting number of bytes that have the pattern (no overlap)
-r2 : to store 1 if byte has pattern, 0 otherwise
-r3 : swap, move
-
-c)
-
-r0 : counting number of occurrences of pattern overall (overlap)
-r1 : 
-r2 : 
-r3 : 
-
+$line_33:
+        lw      $2,20($fp)
+        nop
+        addiu   $2,$2,1
+        sw      $2,20($fp)
+$line_33b:
+        lw      $2,20($fp)
+        nop
+        slt     $2,$2,32
+        bne     $2,$0,$line_10
+        nop
