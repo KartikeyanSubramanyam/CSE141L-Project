@@ -19,7 +19,6 @@ Loop:
     mov rY, rM                     # Clear out rY   
     
     # Calculating for q8, q4, q2, q1, q0
-    # 9 done 10 done 11 done d8 done d7 done d6 done d5 done 
 
     # This will be accessing r0 because d11:5 is in r0
 
@@ -196,7 +195,10 @@ Loop:
     lsl rX, 7                      # Keep only p1 bit
     lsr rX, 7                      # Shifts for xor with p0
     xor rY                         # XOR rX and rY, put into rY
- # -   - - - - - - - - - - - - - 
+
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
     # at this point all the parity bits are in rY
     # so now we move it to rA
     mov rA, rY
@@ -247,37 +249,177 @@ Loop:
     lsr rX, 7
     xor rY
 
-    # -- -- - - - - - - - - -
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
     # at this point rA has p[] and rY has q[]
     mov rB, rY
     mov rX, rA
     xor rY
-    # now rY has s[] which is the result of p[] ^ q[] 
 
+    # now rY has s[] which is the result of p[] ^ q[] 
+    mov rC, rY
 
     # ---- up until this should be correct 
-    # 0 0 0 s8 s4 s2 s1 s0
-    0x01
-    0x1E
+    
+    # rY = rC = 0 0 0 s8 s4 s2 s1 s0
 
-    # now we have the xor between all the parity bits in p and q sorted in rS
-    # now checking for p[0] and q[0]
-    mov rX, rS
+   
+
+    # we check if s[] == 0 because if it is theres no error that we can report and we move to the Done branch
+    mov rX, rC
+    li 0
+    mov rY, rM
+    sbfeq
+    b $Done
+
+
+    # now we check if s0 is zero or not, because if it is, then we are dealing with two bit error
+    # and can proceed to the same Done branch
+    mov rX, rC
+    li 0
+    mov rY, rM
     lsl rX, 7
-    and rX, 0x80
-    
+    lsr rX, 7
+    sbfeq
+    b $Done_2_Error
 
 
+    # since there is an error and s0 is also not 0, we can assume there is a 1 bit error
+    # so we check s1:8 to find which bit to fix
+    mov rX, rC
+    lsr rX, 1
+
+
+    # bad parity bit p1 check since 1 == 0001
+    li 1
+    mov rY, rM
+    sbfeq
+    b $Position_1
+
+    # bad parity bit p2 check since 2 == 0010
+    li 2
+    mov rY, rM
+    sbfeq
+    b $Position_2
+
+    li 3
+    mov rY, rM
+    sbfeq
+    b $Position_3
+
+    # bad parity bit p4 check since 4 == 0100
+    li 4
+    mov rY, rM
+    sbfeq
+    b $Position_4
+
+    li 5
+    mov rY, rM
+    sbfeq
+    b $Position_5
+
+    li 6
+    mov rY, rM
+    sbfeq
+    b $Position_6
+
+    li 7
+    mov rY, rM
+    sbfeq
+    b $Position_7
+
+    # bad parity bit p8 check since 8 == 1000
+    li 8
+    mov rY, rM
+    sbfeq
+    b $Position_8    
     
+
+    li 9
+    mov rY, rM
+    sbfeq
+    b $Position_9
+
+    li 10
+    mov rY, rM
+    sbfeq
+    b $Position_10
+
+    li 11
+    mov rY, rM
+    sbfeq
+    b $Position_11
+
+    li 12
+    mov rY, rM
+    sbfeq
+    b $Position_12
+
+
+    li 13
+    mov rY, rM
+    sbfeq
+    b $Position_13
+
+    li 14
+    mov rY, rM
+    sbfeq
+    b $Position_14
+
+    li 15
+    mov rY, rM
+    sbfeq
+    b $Position_15
+
+
+
+
+# - - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+# at this point we have s[] in rC, r4 and r5 have the input mem[0] and mem[1] respectively
+Position_1:
+    
+
+Position_2:
+
+Position_3:
+
+Position_4:
+
+Position_5:
+
+Position_6:
+
+
+Position_7:
+
+Position_8:
+
+Position_9:
+
+Position_10:
+
+Position_11:
+
+Position_12:
+
+Position_13:
+
+Position_14:
+
+Position_15: 
+
+Done_1_Error:
+
+Done_2_Error:
+
+Done:
     # Store output into mem[30:59]
     mov rM, rY                     # Put rY into rM
     sb r2                          # Store rM, mem[30]
     mov rM, rY                     # Put rY into rM
     sb r2                          # Store rM, mem[31]
-    
 Iterate:
-    swt                 # Switch register sets
     li  2
     mov rY, rM          # 2
     mov rX, r4          # 0
