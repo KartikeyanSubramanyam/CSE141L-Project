@@ -1,18 +1,18 @@
 
 // Register File - 16 file
-module reg_file();
-
 const int NUM_REGISTERS = 16;
 
-// INPUT
-input            clk, reset, start;
-// input logic[8:0] instruction;
-input logic[7:0] val_in;                // write-back
-input logic      write_en;
-input logic[3:0] reg_dest, reg1_out, reg2_out;
+module reg_file(
+    // INPUT
+    input            clk, reset, start,
+    // input logic[8:0] instruction;
+    input logic[7:0] val_in,                // write-back
+    input logic      write_en,
+    input logic[3:0] reg_dest, reg1_out, reg2_out,
 
-// OUTPUT
-output logic[7:0] val1_out, val2_out;
+    // OUTPUT
+    output logic[7:0] val1_out, val2_out
+);
 
 // INTERNAL
 logic done;
@@ -51,3 +51,4 @@ always_ff @(posedge clk, posedge reset) begin
         val2_out <= registers[reg2_out];
     end
 end
+endmodule
