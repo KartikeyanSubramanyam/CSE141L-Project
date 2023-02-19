@@ -376,38 +376,80 @@ Loop:
 
 # - - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-# at this point we have s[] in rC, r4 and r5 have the input mem[0] and mem[1] respectively
+# at this point we have s[] in rC, r0 and r1 have the input mem[0] and mem[1] respectively
+# rA and rB can be freed
+
 Position_1:
+    li 0
+    mov rY, rM
+    mov rA, rM
+    mov rB, rM
+    mov rX, r1
+    lsr rX, 3
+    xor rY
+    lsr rX, 2
+    lsl rX, 1
+    xor rY
+    
+    sbfjp
+    b $Done_1_Error
     
 
 Position_2:
+    sbfjp
+    b $Done_1_Error
 
 Position_3:
+    sbfjp
+    b $Done_1_Error
 
 Position_4:
+    sbfjp
+    b $Done_1_Error
 
 Position_5:
+    sbfjp
+    b $Done_1_Error
 
 Position_6:
-
+    sbfjp
+    b $Done_1_Error
 
 Position_7:
+    sbfjp
+    b $Done_1_Error
 
 Position_8:
+    sbfjp
+    b $Done_1_Error
 
 Position_9:
+    sbfjp
+    b $Done_1_Error
 
 Position_10:
+    sbfjp
+    b $Done_1_Error
 
 Position_11:
+    sbfjp
+    b $Done_1_Error
 
 Position_12:
+    sbfjp
+    b $Done_1_Error
 
 Position_13:
+    sbfjp
+    b $Done_1_Error
 
 Position_14:
+    sbfjp
+    b $Done_1_Error
 
 Position_15: 
+    sbfjp
+    b $Done_1_Error
 
 Done_1_Error:
 

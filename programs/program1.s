@@ -185,7 +185,9 @@ Loop:
     mov rM, rY                     # Put rY into rM
     sb r2                          # Store rM, mem[30]
     mov rM, rY                     # Put rY into rM
-    sb r2                          # Store rM, mem[31]
+    sb r3                          # Store rM, mem[31]
+
+    # TODO will have to fix addressing for storing to make it relative to input memory address
     
 Iterate:
     swt                 # Switch register sets
