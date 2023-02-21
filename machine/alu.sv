@@ -3,8 +3,6 @@
 
 module alu (
     input logic [7:0] in1, in2,
-    input logic       carry_in,
-    input logic [2:0] shift_factor,
     input logic [4:0] operation,
 
     // 00101 - C
@@ -15,7 +13,7 @@ module alu (
     // input logic 
 
     output logic [7:0] out,
-    output logic zero, carry_out
+    output logic zero
 );
 
 always_comb begin
@@ -28,7 +26,7 @@ always_comb begin
         5'b00011    : out = in1 ^ in2;      // xor
         5'b00100    : out = in1 + in2;      // add
         5'b00101    : out = in1 - in2;      // sub
-        default     : out = 8'b11111111;    // nop default    
+        default     : out = 8'b11111111;    // error    
     endcase
 end
 endmodule

@@ -1,24 +1,24 @@
 
 // Register File - 16 file
-const int NUM_REGISTERS = 16;
+parameter NUM_REGISTERS = 16;
 
 module reg_file(
     // INPUT
-    input            clk, reset, start,
+    input            clk, reset,
     // input logic[8:0] instruction;
     input logic[7:0] val_in,                // write-back
     input logic      write_en,
-    input logic[3:0] reg_dest, reg1_out, reg2_out,
+    input logic[3:0] wr_addr, rd_addr1, rd_addr2,
 
     // OUTPUT
     output logic[7:0] val1_out, val2_out
+    // output logic[7:0] rX, rY, rZ, rW, r0, r1, r2, r3, r4, r5, r6, r7, rA, rB, rC, rM;
 );
 
 // INTERNAL
-logic done;
 logic[7:0] registers[NUM_REGISTERS];
-logic[7:0] rX, rY, rZ, rW, r0, r1, r2, r3, r4, r5, r6, r7, rA, rB, rC, rM;
 
+logic[7:0] rX, rY, rZ, rW, r0, r1, r2, r3, r4, r5, r6, r7, rA, rB, rC, rM;
 
 assign rX = registers[4'b0000];
 assign rY = registers[4'b0001];
@@ -37,18 +37,16 @@ assign rB = registers[4'b1101];
 assign rC = registers[4'b1110];
 assign rM = registers[4'b1111];
 
+assign val1_out = registers[rd_addr1];
+assign val2_out = registers[rd_addr2];
 
-always_ff @(posedge clk, posedge reset) begin
+always_ff @(posedge clk) begin
     if (reset) begin
-        done <= 0;
         for (int i = 0; i < NUM_REGISTERS; i=i+1) registers[i] <= 0;
-        val1_out <= 0;
-        val2_out <= 0;
     end
     else begin
-        if (write_en) registers[reg_dest] <= val_in;
-        val1_out <= registers[reg1_out];
-        val2_out <= registers[reg2_out];
+        if (write_en) registers[wr_addr] <= val_in;
     end
 end
+
 endmodule

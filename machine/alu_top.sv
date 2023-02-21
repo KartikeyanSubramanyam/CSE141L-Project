@@ -15,14 +15,14 @@ logic [7:0] alu_out;
 logic carry_in, carry_out;
 logic [4:0] operation;
 
-alu_control() control_inst (
+alu_control control_inst (
     .s_or_c(s_or_c),
     .shift_dir(opcode[3]),
     .op_in(opcode),
     .op_out(operation)
 );
 
-alu() alu_inst (
+alu alu_inst (
     .in1(in1),
     .in2(in2),
     .carry_in(carry_in),

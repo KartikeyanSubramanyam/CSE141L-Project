@@ -1,0 +1,31 @@
+Warning (10236): Verilog HDL Implicit Net warning at top_level.sv(32): created implicit net for "absj"
+Warning (10236): Verilog HDL Implicit Net warning at top_level.sv(38): created implicit net for "how_high"
+Warning (10236): Verilog HDL Implicit Net warning at top_level.sv(56): created implicit net for "rd_addrB"
+Warning (10236): Verilog HDL Implicit Net warning at top_level.sv(59): created implicit net for "regfile_dat"
+Warning (10236): Verilog HDL Implicit Net warning at top_level.sv(73): created implicit net for "sc"
+Warning (10236): Verilog HDL Implicit Net warning at top_level.sv(75): created implicit net for "sc_o"
+Warning (10858): Verilog HDL warning at top_level.sv(13): object immed used but never assigned
+Warning (10036): Verilog HDL or VHDL warning at top_level.sv(14): object "sc_in" assigned a value but never read
+Warning (10036): Verilog HDL or VHDL warning at top_level.sv(15): object "pariQ" assigned a value but never read
+Warning (10036): Verilog HDL or VHDL warning at top_level.sv(16): object "zeroQ" assigned a value but never read
+Warning (10858): Verilog HDL warning at top_level.sv(19): object zero used but never assigned
+Warning (10858): Verilog HDL warning at top_level.sv(20): object sc_clr used but never assigned
+Warning (10858): Verilog HDL warning at top_level.sv(21): object sc_en used but never assigned
+Warning (10036): Verilog HDL or VHDL warning at top_level.sv(24): object "alu_cmd" assigned a value but never read
+Warning (10230): Verilog HDL assignment warning at top_level.sv(56): truncated value with size 3 to match size of target (1)
+Warning (10030): Net "immed" at top_level.sv(13) has no driver or initial value, using a default initial value '0'
+Warning (10030): Net "absj" at top_level.sv(32) has no driver or initial value, using a default initial value '0'
+Warning (10030): Net "how_high" at top_level.sv(38) has no driver or initial value, using a default initial value '0'
+Warning (10030): Net "regfile_dat" at top_level.sv(59) has no driver or initial value, using a default initial value '0'
+Warning (10030): Net "sc" at top_level.sv(73) has no driver or initial value, using a default initial value '0'
+Warning (10230): Verilog HDL assignment warning at PC.sv(21): truncated value with size 32 to match size of target (12)
+Warning (10230): Verilog HDL assignment warning at PC_LUT.sv(6): truncated value with size 32 to match size of target (12)
+Warning (10850): Verilog HDL warning at instr_ROM.sv(10): number of words (20) in memory file does not match the number of elements in the address range [0:4095]
+Warning (10030): Net "core.data_a" at instr_ROM.sv(8) has no driver or initial value, using a default initial value '0'
+Warning (10030): Net "core.waddr_a" at instr_ROM.sv(8) has no driver or initial value, using a default initial value '0'
+Warning (10030): Net "core.we_a" at instr_ROM.sv(8) has no driver or initial value, using a default initial value '0'
+Warning (10270): Verilog HDL Case Statement warning at Control.sv(18): incomplete case statement has no default case item
+Warning (12241): 1 hierarchies have connectivity warnings - see the Connectivity Checks report folder
+Warning (21074): Design contains 1 input pin(s) that do not drive logic
+	Warning (15610): No output dependent on input pin "req"
+Warning (15714): Some pins have incomplete I/O assignments. Refer to the I/O Assignment Warnings report for details
