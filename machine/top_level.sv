@@ -1,9 +1,8 @@
 // sample top level design
 module top_level(
-  input        clk, reset, req, 
+  input        clk, reset, 
   output logic done);
-  parameter D = 10,               // program counter width
-    A = 5;             		        // ALU command bit width
+  parameter D = 10;               // program counter width;
   wire[D-1:0] target, 			      // jump 
               prog_ctr;
   wire        RegWrite;
@@ -28,7 +27,7 @@ module top_level(
         MemtoReg,
         FlagWrite,
         absj;
-  wire[A-1:0] ALUOp;
+  wire[4:0] ALUOp;
   wire[8:0]   mach_code;          // machine code
   wire[3:0] rd_addrA, rd_addrB, wr_addr;    // address pointers to reg_file
   wire[2:0] Flag;
