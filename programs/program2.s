@@ -260,10 +260,7 @@ Loop:
     mov rC, rY
 
     # ---- up until this should be correct 
-    
     # rY = rC = 0 0 0 s8 s4 s2 s1 s0
-
-   
 
     # we check if s[] == 0 because if it is theres no error that we can report and we move to the Done branch
     mov rX, rC
@@ -271,7 +268,6 @@ Loop:
     mov rY, rM
     sbfeq
     b $Done
-
 
     # now we check if s0 is zero or not, because if it is, then we are dealing with two bit error
     # and can proceed to the same Done branch
@@ -283,183 +279,95 @@ Loop:
     sbfeq
     b $Done_2_Error
 
-
     # since there is an error and s0 is also not 0, we can assume there is a 1 bit error
     # so we check s1:8 to find which bit to fix
     mov rX, rC
     lsr rX, 1
 
-
     # bad parity bit p1 check since 1 == 0001
     li 1
     mov rY, rM
     sbfeq
-    b $Position_1
+    b $Parity_Error
 
     # bad parity bit p2 check since 2 == 0010
     li 2
     mov rY, rM
     sbfeq
-    b $Position_2
-
-    li 3
-    mov rY, rM
-    sbfeq
-    b $Position_3
+    b $Parity_Error
 
     # bad parity bit p4 check since 4 == 0100
     li 4
     mov rY, rM
     sbfeq
-    b $Position_4
-
-    li 5
-    mov rY, rM
-    sbfeq
-    b $Position_5
-
-    li 6
-    mov rY, rM
-    sbfeq
-    b $Position_6
-
-    li 7
-    mov rY, rM
-    sbfeq
-    b $Position_7
+    b $Parity_Error
 
     # bad parity bit p8 check since 8 == 1000
     li 8
     mov rY, rM
     sbfeq
-    b $Position_8    
+    b $Parity_Error    
     
-
-    li 9
-    mov rY, rM
-    sbfeq
-    b $Position_9
-
-    li 10
-    mov rY, rM
-    sbfeq
-    b $Position_10
-
-    li 11
-    mov rY, rM
-    sbfeq
-    b $Position_11
-
-    li 12
-    mov rY, rM
-    sbfeq
-    b $Position_12
-
-
-    li 13
-    mov rY, rM
-    sbfeq
-    b $Position_13
-
-    li 14
-    mov rY, rM
-    sbfeq
-    b $Position_14
-
-    li 15
-    mov rY, rM
-    sbfeq
-    b $Position_15
-
-
-
-
 # - - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 # at this point we have s[] in rC, r0 and r1 have the input mem[0] and mem[1] respectively
 # rA and rB can be freed
 
-Position_1:
+# bad parity check for p1
+Data_Error:
+    sbfjp
+    b $Done_1_Error
+
+
+Parity_Error:
     li 0
     mov rY, rM
-    mov rA, rM
-    mov rB, rM
     mov rX, r1
     lsr rX, 3
+    xor rX
+    lsr rX, 1
+    xor rX
+    mov rA, rX
+    mov rX, r0
+    lsr rX, 1
+    xor rX
+    mov rY, rA
+    lsl rY, 4
+    lsr rY, 4
+    lsl rX, 4
     xor rY
-    lsr rX, 2
-    lsl rX, 1
+    # rA contains the right 1 ~ 8
+    mov rA, rY
+
+    mov rY, rM
+    mov rX, r0
+    lsr rX, 5
     xor rY
-    
+    # rB contains the right 11 ~ 9
+    mov rB, rY
     sbfjp
     b $Done_1_Error
     
-
-Position_2:
-    sbfjp
-    b $Done_1_Error
-
-Position_3:
-    sbfjp
-    b $Done_1_Error
-
-Position_4:
-    sbfjp
-    b $Done_1_Error
-
-Position_5:
-    sbfjp
-    b $Done_1_Error
-
-Position_6:
-    sbfjp
-    b $Done_1_Error
-
-Position_7:
-    sbfjp
-    b $Done_1_Error
-
-Position_8:
-    sbfjp
-    b $Done_1_Error
-
-Position_9:
-    sbfjp
-    b $Done_1_Error
-
-Position_10:
-    sbfjp
-    b $Done_1_Error
-
-Position_11:
-    sbfjp
-    b $Done_1_Error
-
-Position_12:
-    sbfjp
-    b $Done_1_Error
-
-Position_13:
-    sbfjp
-    b $Done_1_Error
-
-Position_14:
-    sbfjp
-    b $Done_1_Error
-
-Position_15: 
-    sbfjp
-    b $Done_1_Error
-
 Done_1_Error:
+    li 64
+    mov rY, rM
+    mov rX, rB
+    xor rX
+    mov rB, rX
+    sbfjp
+    b $Done
 
 Done_2_Error:
+    li 128
+    mov rB, rM
+    li 0
+    mov rA, 0
 
 Done:
     # Store output into mem[30:59]
-    mov rM, rY                     # Put rY into rM
+    mov rM, rB                     # Put rY into rM
     sb r2                          # Store rM, mem[30]
-    mov rM, rY                     # Put rY into rM
+    mov rM, rA                     # Put rY into rM
     sb r2                          # Store rM, mem[31]
 Iterate:
     li  2
