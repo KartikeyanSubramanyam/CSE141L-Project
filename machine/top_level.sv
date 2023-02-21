@@ -69,18 +69,19 @@ module top_level(
   // assign rd_addrA = mach_code[2:0];
   // assign rd_addrB = mach_code[5:3];
   // assign alu_cmd  = mach_code[8:6];
+  always_comb begin
+    case(instr)    // override defaults with exceptions
+    'b0000: 
+      begin					// store operation
+              MemWrite = 'b1;      // write to data mem
+              RegWrite = 'b0;      // typically don't also load reg_file
+      end
+    'b00001:  ALUOp      = 'b000;  // add:  y = a+b
+    'b00010:  MemtoReg = 'b1;    // 
+    endcase
+  end
 
-  case(instr)    // override defaults with exceptions
-  'b0000:  begin					// store operation
-               MemWrite = 'b1;      // write to data mem
-               RegWrite = 'b0;      // typically don't also load reg_file
-			    end
-  'b00001:  ALUOp      = 'b000;  // add:  y = a+b
-  'b00010:  begin				  // load
-			   MemtoReg = 'b1;    // 
-             end
-// ...
-endcase
+
   reg_file rf_inst(	  // loads, most ops
               .clk,
               .reset

@@ -50,17 +50,21 @@ always_comb begin
   end
   else if (instr[8:5] == 'b1111) begin  // lb and sb operations
     case(instr[4:3])
-    'b00:                         // lb instruction
-    ReadAddr1 = instr[2:0];       // Read from register given by last 3 bits
-    ReadAddr2 = instr[2:0];       // Read from register given by last 3 bits
-    WriteAddr = 'b1111;           // writes to register rM
-    RegWrite = 'b1;               // write to register
-    MemtoReg = 'b1;               // load (route memory to reg file)
-    'b01:                         // sb instruction
-    ReadAddr1 = {1'b0, instr[2:0]};     // Read from register given by last 3 bits
-    ReadAddr2 = {1'b0, instr[2:0]};     // Read from register given by last 3 bits
-    ALUOp = 'b00000;              // "and" where it is reading from
-    MemWrite = 'b1;               // write to memory rM
+      'b00:                         // lb instruction
+      begin
+        ReadAddr1 = instr[2:0];       // Read from register given by last 3 bits
+        ReadAddr2 = instr[2:0];       // Read from register given by last 3 bits
+        WriteAddr = 'b1111;           // writes to register rM
+        RegWrite = 'b1;               // write to register
+        MemtoReg = 'b1;               // load (route memory to reg file)
+      end
+      'b01:                         // sb instruction
+      begin
+        ReadAddr1 = {1'b0, instr[2:0]};     // Read from register given by last 3 bits
+        ReadAddr2 = {1'b0, instr[2:0]};     // Read from register given by last 3 bits
+        ALUOp = 'b00000;              // "and" where it is reading from
+        MemWrite = 'b1;               // write to memory rM
+      end
     endcase
   end
   else if (instr[8:5] == 'b1110 && instr[4:3] == 'b11) begin  // set branch flag operations
