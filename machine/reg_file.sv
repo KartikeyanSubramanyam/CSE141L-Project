@@ -12,7 +12,6 @@ module reg_file(
 
     // OUTPUT
     output logic[7:0] val1_out, val2_out
-    // output logic[7:0] rX, rY, rZ, rW, r0, r1, r2, r3, r4, r5, r6, r7, rA, rB, rC, rM;
 );
 
 // INTERNAL

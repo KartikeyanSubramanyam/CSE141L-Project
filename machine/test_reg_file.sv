@@ -10,8 +10,6 @@ logic write_en;
 
 logic[3:0] wr_addr, rd_addr1, rd_addr2;
 
-// logic[7:0] rX, rY, rZ, rW, r0, r1, r2, r3, r4, r5, r6, r7, rA, rB, rC, rM;
-
 // Generate the clock signal
 initial begin
     clk = 1'b0;
@@ -44,10 +42,6 @@ reg_file rf_inst (
     .wr_addr(wr_addr),
     .rd_addr1(rd_addr1),
     .rd_addr2(rd_addr2)
-    //.rX, .rY, .rZ, .rW, 
-    //.r0, .r1, .r2, .r3,
-    //.r4, .r5, .r6, .r7,
-    //.rA, .rB, .rC, .rM
 );
 
 
