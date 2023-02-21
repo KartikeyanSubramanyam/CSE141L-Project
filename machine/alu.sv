@@ -12,8 +12,7 @@ module alu (
 
     // input logic 
 
-    output logic [7:0] out,
-    output logic zero
+    output logic [7:0] out
 );
 
 always_comb begin

@@ -11,7 +11,7 @@ module reg_file(
     input logic[3:0] wr_addr, rd_addr1, rd_addr2,
 
     // OUTPUT
-    output logic[7:0] val1_out, val2_out
+    output logic[7:0] val1_out, val2_out, regMem
 );
 
 // INTERNAL
