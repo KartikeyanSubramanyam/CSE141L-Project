@@ -8,7 +8,7 @@ module top_level(
               prog_ctr;
   wire        RegWrite;
   wire[7:0]   datA,datB,		      // from RegFile
-              muxB, 
+              muxB, muxR, 
 			        rslt,               // alu output
               immed,
               mem_data,
@@ -25,7 +25,7 @@ module top_level(
         MemWrite,
         ALUSrc,		                // immediate switch
         Branch,
-        MemtoR,
+        MemtoReg,
         FlagWrite,
         absj;
   wire[A-1:0] ALUOp;
@@ -46,45 +46,28 @@ module top_level(
   //        .target          );   
 
 // contains machine code
-  instr_ROM ir1(.prog_ctr,
+  instr_ROM #(.D(D)) ir_inst(.prog_ctr,
                 .mach_code);
 
 // control decoder
-  Control ctl1(.instr(mach_code),
+  Control ctl_inst(.instr(mach_code),
   .Branch, 
   .MemWrite, 
   .ALUSrc, 
   .RegWrite,     
-  .MemtoR,
-  .RegWrite,
+  .MemtoReg,
   .FlagWrite,
   .ALUOp(ALUop),
   .ReadAddr1(rd_addrA),
   .ReadAddr2(rd_addrB),
-  .WriteAddr1(wr_addr),
+  .WriteAddr(wr_addr),
   .Flag(Flag)
-  
   );
-
-  // assign rd_addrA = mach_code[2:0];
-  // assign rd_addrB = mach_code[5:3];
-  // assign alu_cmd  = mach_code[8:6];
-  always_comb begin
-    case(instr)    // override defaults with exceptions
-    'b0000: 
-      begin					// store operation
-              MemWrite = 'b1;      // write to data mem
-              RegWrite = 'b0;      // typically don't also load reg_file
-      end
-    'b00001:  ALUOp      = 'b000;  // add:  y = a+b
-    'b00010:  MemtoReg = 'b1;    // 
-    endcase
-  end
-
 
   reg_file rf_inst(	  // loads, most ops
               .clk,
-              .reset
+              .reset,
+              .val_in     (muxR),
               .write_en   (RegWrite),
               .rd_addr1   (rd_addrA),
               .rd_addr2   (rd_addrB),
@@ -106,6 +89,8 @@ module top_level(
 			        .addr   (aluOut),
               .dat_out(mem_data));
 
+  assign muxR = MemtoReg ? mem_data : aluOut;
+
 // registered flags from ALU
   // always_ff @(posedge clk) begin
   //   pariQ <= pari;
@@ -116,6 +101,6 @@ module top_level(
   //     sc_in <= sc_o;
   // end
 
-  assign done = &instr;
+  assign done = &mach_code;
  
 endmodule

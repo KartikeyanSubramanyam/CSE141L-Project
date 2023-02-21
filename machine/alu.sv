@@ -29,37 +29,3 @@ always_comb begin
     endcase
 end
 endmodule
-
-module alu_control (
-    input logic s_or_c, shift_dir,
-    // s_or_c: 0 - C, 1 - S
-    // shift_dir: 0 - left, 1 - right
-    input logic [3:0] op_in,
-
-    output logic [4:0] op_out
-);
-
-always_comb begin
-    op_out = 5'b11111;
-    if (s_or_c) begin
-        if (shift_dir) begin
-            op_out = 5'b10001
-        end else begin
-            op_out = 5'b10000
-        end
-    end else begin
-        // case (op_in)
-        //     4'b0000 : op_out = 5'b00000
-        //     4'b0001 : op_out = 5'b00001
-        //     4'b0010 : op_out = 5'b00010
-        //     4'b0011 : op_out = 5'b00011
-        //     4'b0100 : op_out = 5'b00100
-        //     4'b0101 : op_out = 5'b00101
-        //     4'b0110 : op_out = 5'b00110
-        //     4'b0111 : op_out = 5'b00111
-        // endcase
-        op_out[4] = 1'b0
-        op_out[3:0] = op_in[3:0]
-    end
-end
-endmodule
