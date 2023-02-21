@@ -8,9 +8,9 @@ module Control #(parameter opwidth = 9)(
 
 always_comb begin
   // defaults
-  ReadAddr1 = 'b0000;   // Read from rX
-  ReadAddr2 = 'b0001;   // Read from rY
-  WriteAddr = 'b0000    // defaults addr to rX
+  ReadAddr1 = 'b1000;   // Read from rX
+  ReadAddr2 = 'b1001;   // Read from rY
+  WriteAddr = 'b0000;    // defaults addr to rX
   Branch 	  = 'b0;      // 1: branch (jump)
   MemWrite  =	'b0;      // 1: store to memory
   ALUSrc 	  =	'b0;      // 1: immediate  0: second reg file output
@@ -39,7 +39,7 @@ always_comb begin
     MemtoReg  =	'b1;              // Writes from memory to register (immediate)
   end
   else if (instr[8:6] == 'b110) begin // LSL and LSR operations
-    WriteAddr = instr[4:3];       // sets register destination
+    WriteAddr = {2'b10, instr[4:3]};       // sets register destination
     ALUSrc = (instr[2:0] == 0) ? 0 : 1;
     case(instr[5])
     'b0:                            // lsl operation
@@ -80,7 +80,7 @@ always_comb begin
     endcase
   end 
   else if (instr[8:5] == 'b1110 && instr[4:3] != 'b11) begin // Computational Operations
-    WriteAddr = {2'b00, instr[1:0]}; // Writes into rX, rY, rZ, or rW  
+    WriteAddr = {2'b10, instr[1:0]}; // Writes into rX, rY, rZ, or rW  
     RegWrite = 'b1;                 // writes to register
     case(instr[4:2])
     'b000:                         // logical add operation
