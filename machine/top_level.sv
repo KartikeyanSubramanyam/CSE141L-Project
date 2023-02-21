@@ -56,7 +56,7 @@ module top_level(
   .RegWrite,     
   .MemtoReg,
   .FlagWrite,
-  .ALUOp(ALUop),
+  .ALUOp(ALUOp),
   .ReadAddr1(rd_addrA),
   .ReadAddr2(rd_addrB),
   .WriteAddr(wr_addr),
@@ -82,7 +82,7 @@ module top_level(
 		        .in2    (muxB),                    // input to sc register
 		        .out    (aluOut));  
 
-  dat_mem dm_inst(.dat_in(rM),                    // from reg_file
+  dat_mem dm1(.dat_in(rM),                    // from reg_file
               .clk,
 			        .wr_en  (MemWrite),                 // stores
 			        .addr   (aluOut),
