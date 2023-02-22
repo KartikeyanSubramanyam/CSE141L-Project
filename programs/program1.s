@@ -203,3 +203,5 @@ Iterate:
     mov rY, rM
     sbflt               # rX < rY then branch
     b $Loop
+
+    done

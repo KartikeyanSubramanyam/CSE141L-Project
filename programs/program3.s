@@ -205,3 +205,5 @@ L1_end:
         mov     r6, rM          # loads 35 into r6
         mov     rM, rC
         sb      r6              # store rC into mem[35]
+
+        done
