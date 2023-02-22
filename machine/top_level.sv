@@ -73,12 +73,6 @@ module top_level(
     .regMem     (rM)
   );
 
-  // If ALUSrc, use immediate
-  // If immediate is 3 bits, use last 3 bits; otherwise, use last 6 bits (6 bit immediate)
-  assign muxB = ALUSrc ? {5'b0, mach_code[2:0]} : datB;
-
-  assign muxOut = Immed ? {2'b0, mach_code[5:0]} : aluOut;
-
   alu alu_inst(
     .operation(ALUOp),
     .in1    (datA),
@@ -95,6 +89,10 @@ module top_level(
   );
 
   assign muxR = MemtoReg ? mem_data : muxOut;
+  // If ALUSrc, use immediate
+  assign muxB = ALUSrc ? {5'b0, mach_code[2:0]} : datB;
+
+  assign muxOut = Immed ? {2'b0, mach_code[5:0]} : aluOut;
 
   assign done = &mach_code;
  
