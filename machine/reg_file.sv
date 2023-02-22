@@ -39,6 +39,7 @@ assign rM = registers[4'b1111];
 
 assign val1_out = registers[rd_addr1];
 assign val2_out = registers[rd_addr2];
+assign regMem   = rM;
 
 always_ff @(posedge clk) begin
     if (reset) begin

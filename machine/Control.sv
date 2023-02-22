@@ -1,7 +1,7 @@
 // control decoder
 module Control #(parameter opwidth = 9)(
   input [opwidth-1:0] instr,    // opcode signifies what instruction it is
-  output logic Branch, MemtoReg, MemWrite, ALUSrc, RegWrite, FlagWrite,
+  output logic Branch, MemtoReg, MemWrite, ALUSrc, RegWrite, FlagWrite, Immed,
   output logic[2:0] Flag,
   output logic[3:0] ReadAddr1, ReadAddr2, WriteAddr,
   output logic[4:0] ALUOp);	   // for up to 32 ALU operations
@@ -13,15 +13,16 @@ always_comb begin
   WriteAddr = 'b0000;    // defaults addr to rX
   Branch 	  = 'b0;      // 1: branch (jump)
   MemWrite  =	'b0;      // 1: store to memory
-  ALUSrc 	  =	'b0;      // 1: immediate  0: second reg file output
+  ALUSrc 	  =	'b0;      // 1: immediate as input into ALU  0: second reg file output as input into ALU
   RegWrite  =	'b0;      // 0: for store or no op  1: most other operations 
   MemtoReg  =	'b0;      // 1: load -- route memory instead of ALU to reg_file data in
   ALUOp	    = 'b11111;  // default value or ERROR
   FlagWrite = 'b0;      // 1: update flag   0: keep flag bits the same
   Flag      = 'b000;    // flag bits
+  Immed     = 'b0;      // 1: immediate as ALU output 0: ALU output
     
   // Contains each instruction bits situation needed
-  if (instr[0] == 0) begin         // mov operation
+  if (instr[8] == 0) begin         // mov operation
     ReadAddr1 = instr[3:0];
     ReadAddr2 = instr[3:0];
     WriteAddr = instr[7:4];
@@ -30,13 +31,12 @@ always_comb begin
   end
   else if (instr[8:6] == 'b100) begin // b instruction
     Branch = 'b1;                 // instruction jumps
-    ALUSrc = 'b1;                 // immediate needed to branch
+    Immed = 'b1;                 // immediate needed to branch
   end
   else if (instr[8:6] == 'b101) begin // li instruction
-    ALUSrc = 'b1;                 // sets to immediate
+    Immed = 'b1;                 // sets to immediate
     RegWrite = 'b1;               // writes to register
     WriteAddr = 'b1111;           // writes to register rM
-    MemtoReg  =	'b1;              // Writes from memory to register (immediate)
   end
   else if (instr[8:6] == 'b110) begin // LSL and LSR operations
     WriteAddr = {2'b10, instr[4:3]};       // sets register destination
@@ -48,21 +48,19 @@ always_comb begin
       ALUOp = 'b10001;              // sets ALU op to LSR
     endcase
   end
-  else if (instr[8:5] == 'b1111) begin  // lb and sb operations
-    case(instr[4:3])
-      'b00:                         // lb instruction
+  else if (instr[8:4] == 'b11110) begin  // lb and sb operations
+    ReadAddr1 = {1'b0, instr[2:0]};       // Read from register given by last 3 bits
+    ReadAddr2 = {1'b0, instr[2:0]};       // Read from register given by last 3 bits
+    ALUOp = 'b00000;              // "and" where it is reading from
+    case(instr[3])
+      'b0:                         // lb instruction
       begin
-        ReadAddr1 = instr[2:0];       // Read from register given by last 3 bits
-        ReadAddr2 = instr[2:0];       // Read from register given by last 3 bits
         WriteAddr = 'b1111;           // writes to register rM
         RegWrite = 'b1;               // write to register
         MemtoReg = 'b1;               // load (route memory to reg file)
       end
-      'b01:                         // sb instruction
+      'b1:                         // sb instruction
       begin
-        ReadAddr1 = {1'b0, instr[2:0]};     // Read from register given by last 3 bits
-        ReadAddr2 = {1'b0, instr[2:0]};     // Read from register given by last 3 bits
-        ALUOp = 'b00000;              // "and" where it is reading from
         MemWrite = 'b1;               // write to memory rM
       end
     endcase
