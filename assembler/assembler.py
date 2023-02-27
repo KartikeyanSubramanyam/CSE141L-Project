@@ -31,9 +31,8 @@ def file_parser(tokenized_lines, line_nums):
     
     return machine_codes
 
-
+# parses the instruction tokens to produce a 9-bit machine code
 def instruction_parser(instruction_tokens, line_num):
-    # parse the instruction tokens to produce a 9-bit machine code
     machine_code = "000000000"
     op = instruction_tokens[0]
     args = instruction_tokens[1:]
@@ -47,17 +46,23 @@ def instruction_parser(instruction_tokens, line_num):
         machine_code[3:]  = get_immediate(args[0], 0, 2**6-1, 6, line_num)
     elif op == "li":
         machine_code[0:3] = '101'
-        machine_code[3:]  = get_immediate(args[0], 0, max, size, line_num)
+        machine_code[3:]  = get_immediate(args[0], 0, 2**6-1, 6, line_num)
     elif op == "lsl":
         machine_code[0:4] = '1100'
         if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
             machine_code[4:6] = register_code(args[0], line_num)[-2:]
-        machine_code[6:]  = get_immediate(args[1], 0, 7, 3, line_num)
+        if len(args) > 1:
+            machine_code[6:]  = get_immediate(args[1], 1, 7, 3, line_num)
+        else:
+            machine_code[6:]  = "000"
     elif op == "lsr":
         machine_code[0:4] = '1101'
         if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
             machine_code[4:6] = register_code(args[0], line_num)[-2:]
-        machine_code[6:] = get_immediate(args[1], 0, 7, 3, line_num)
+        if len(args) > 1:
+            machine_code[6:] = get_immediate(args[1], 1, 7, 3, line_num)
+        else:
+            machine_code[6:] = "000"
     elif op == "lb":
         machine_code[0:6] = '111100'
         if check_register(args[0], ['r' + str(i) for i in range(8)], line_num):
@@ -77,27 +82,27 @@ def instruction_parser(instruction_tokens, line_num):
     elif op == "and":
         machine_code[0:7] = '1110010'
         if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
-            machine_code[4:6] = register_code(args[0], line_num)[-2:]
+            machine_code[7:] = register_code(args[0], line_num)[-2:]
     elif op == "or":
         machine_code[0:7] = '1110011'
         if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
-            machine_code[4:6] = register_code(args[0], line_num)[-2:]
+            machine_code[7:] = register_code(args[0], line_num)[-2:]
     elif op == "not":
         machine_code[0:7] = '1110100'
         if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
-            machine_code[4:6] = register_code(args[0], line_num)[-2:]
+            machine_code[7:] = register_code(args[0], line_num)[-2:]
     elif op == "xor":
         machine_code[0:7] = '1110101'
         if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
-            machine_code[4:6] = register_code(args[0], line_num)[-2:]
+            machine_code[7:] = register_code(args[0], line_num)[-2:]
     elif op == "add":
         machine_code[0:7] = '1110000'
         if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
-            machine_code[4:6] = register_code(args[0], line_num)[-2:]
+            machine_code[7:] = register_code(args[0], line_num)[-2:]
     elif op == "sub":
         machine_code[0:7] = '1110001'
         if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
-            machine_code[4:6] = register_code(args[0], line_num)[-2:]
+            machine_code[7:] = register_code(args[0], line_num)[-2:]
     elif op == "nop":
         machine_code = '111111110'
     elif op == "done":
@@ -106,6 +111,8 @@ def instruction_parser(instruction_tokens, line_num):
         print("Error on line {}: no such instruction \'{}\' exists".format(line_num, op))
     return machine_code
 
+# checks if the input register is within the list of valid registers
+# if not, throws an error
 def check_register(register, valid_registers, line_num):
     for reg in valid_registers:
         if register.upper() == reg.upper():
@@ -114,6 +121,8 @@ def check_register(register, valid_registers, line_num):
     print("Error on line {}: invalid register \'{}\' exists".format(line_num, register))
     return False
 
+# converts a string representation of a register into a 4-bit binary representation
+# throws an error when encountering a non-existent register name (e.g. "rF")
 def register_code(register, line_num):
     reg_num = ord(register.upper()[1])
     if reg_num >= ord('0') and reg_num <= ord('7'):
@@ -130,7 +139,8 @@ def register_code(register, line_num):
         print("Error on line {}: no such register \'{}\' exists".format(line_num, register))
         return -1
 
-
+# checks if the input immediate is within bounds, then formats into binary
+# if not within bounds, throws an error
 def get_immediate(immediate, min, max, size, line_num):
     immed_int = int(immediate)
     if immed_int >= min and immed_int <= max:
