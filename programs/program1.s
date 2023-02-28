@@ -1,16 +1,11 @@
 # TODO: Write loop structure for 15 messages
-    swt                            # Switch register sets
     li  0                          # Load immediate 0 into rM 
     mov r4, rM                     # 
     li  1                          # Load immediate 1 into rM
-    mov r5, rM                     #
-    nop                            # nop in order to match with Branch's power of 4
-    nop
-    nop
+    mov r5, rM                     
 Loop:
     mov r0, r4
     mov r1, r5
-    swt                            # Switch register sets
     lb  r0                         # Load mem[0] into rM
     mov r0, rM                     # ldb r0, mem[0]
     lb  r1                          # Load mem[1] into rM
@@ -190,7 +185,6 @@ Loop:
     # TODO will have to fix addressing for storing to make it relative to input memory address
     
 Iterate:
-    swt                 # Switch register sets
     li  2
     mov rY, rM          # 2
     mov rX, r4          # 0

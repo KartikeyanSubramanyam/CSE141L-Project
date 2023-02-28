@@ -1,39 +1,94 @@
+import re
+import argparse
+
+argParser = argparse.ArgumentParser()
+argParser.add_argument("input_file")
+argParser.add_argument("output_file")
+args = argParser.parse_args()
+
+BRANCH_EXTEND = 3
 
 def main():
-    pass
+    input_contents = read_file(args.input_file)
+    lexed_contents, line_nums = file_lexer(input_contents)
+    machine_codes  = file_parser(lexed_contents, line_nums)
+    write_file(args.output_file, machine_codes)
 
 def read_file(file_name):
     # do file i/o here to read in the assembly code
-    pass
+    iFile = open(file_name, "r")
+    file_contents = iFile.read().split("\n")
+    return file_contents
 
 def write_file(file_name, file_contents):
     # do file i/o here to write out the machine code
-    pass
+    oFile = open(file_name, "w")
+    for index in range(len(file_contents)):
+        oFile.write(file_contents[index])
+        if index != len(file_contents) - 1:
+            oFile.write("\n")
 
 def file_lexer(fileLines):
     # the goal is to tokenize each line of the file
     lexed_tokens = []
+    line_nums = []
+    line_num = 1
     for line in fileLines:
-        instruction_lexer(line);
-
+        lexed_tokens.append(instruction_lexer(line))
+        line_nums.append(line_num)
+        line_num += 1
     return lexed_tokens, line_nums
 
 def instruction_lexer(line):
     # separate each instruction into tokens
-    return ["placeholder", "r0", "r0"]
+    hashtag = line.find("#")
+    if hashtag > -1:
+        cleaned_line = line[:hashtag]
+    else:
+        cleaned_line = line
+    tokens = re.split(',| ', cleaned_line)
+    return [t.strip() for t in tokens if t != '']
 
 def file_parser(tokenized_lines, line_nums):
     machine_codes = [] # list of 9-bit machine codes
+    branch_labels = {}
+
+    index = 0
+    while index < len(tokenized_lines):
+        if len(tokenized_lines[index]) == 0:
+            del tokenized_lines[index]
+            index -= 1
+            continue
+
+        for token in tokenized_lines[index]:
+            colon = token.find(":")
+            if colon > -1 and len(token) > 1:
+                tokenized_lines[index].remove(token)
+                if len(tokenized_lines[index]) == 0:
+                    del tokenized_lines[index]
+                num_nops = pad_nops(tokenized_lines, index)
+                index += num_nops
+                branch_labels[token[:colon]] = index
+        
+        index += 1
 
     for line in tokenized_lines:
-        pass
-        # instruction_parser
-    
+        machine_codes.append(instruction_parser(line, branch_labels, 1))
+        
     return machine_codes
 
+def pad_nops(tokenized_lines, index):
+    multiples_of = (2**BRANCH_EXTEND)
+    num_nops = multiples_of - (index % multiples_of)
+    if num_nops == multiples_of:
+        num_nops = 0
+    for i in range(num_nops):
+        tokenized_lines.insert(index, ["nop"])
+    return num_nops
+
 # parses the instruction tokens to produce a 9-bit machine code
-def instruction_parser(instruction_tokens, line_num):
-    machine_code = "000000000"
+def instruction_parser(instruction_tokens, branch_labels, line_num):
+    machine_code = list("000000000")
     op = instruction_tokens[0]
     args = instruction_tokens[1:]
 
@@ -43,7 +98,12 @@ def instruction_parser(instruction_tokens, line_num):
         machine_code[5:9] = register_code(args[1], line_num)
     elif op == "b":
         machine_code[0:3] = '100'
-        machine_code[3:]  = get_immediate(args[0], 0, 2**6-1, 6, line_num)
+        immed = args[0]
+        dollar = immed.find("$")
+        if dollar > -1:
+            immed_int = branch_labels[immed[dollar + 1:]] >> BRANCH_EXTEND
+            immed = str(immed_int)
+        machine_code[3:]  = get_immediate(immed, 0, 2**6-1, 6, line_num)
     elif op == "li":
         machine_code[0:3] = '101'
         machine_code[3:]  = get_immediate(args[0], 0, 2**6-1, 6, line_num)
@@ -66,11 +126,11 @@ def instruction_parser(instruction_tokens, line_num):
     elif op == "lb":
         machine_code[0:6] = '111100'
         if check_register(args[0], ['r' + str(i) for i in range(8)], line_num):
-            machine_code[4:] = register_code(args[0], line_num)[-3:]
+            machine_code[6:] = register_code(args[0], line_num)[-3:]
     elif op == "sb":
         machine_code[0:6] = '111101'
         if check_register(args[0], ['r' + str(i) for i in range(8)], line_num):
-            machine_code[4:] = register_code(args[0], line_num)[-3:]
+            machine_code[6:] = register_code(args[0], line_num)[-3:]
     elif op[0:3] == "sbf":
         machine_code[0:6] = '111011'
         flags = ["ne", "eq", "lt", "le", "jp"]
@@ -109,7 +169,7 @@ def instruction_parser(instruction_tokens, line_num):
         machine_code = "111111111"
     else:
         print("Error on line {}: no such instruction \'{}\' exists".format(line_num, op))
-    return machine_code
+    return ''.join(machine_code)
 
 # checks if the input register is within the list of valid registers
 # if not, throws an error
@@ -148,3 +208,6 @@ def get_immediate(immediate, min, max, size, line_num):
     else:
         print("Error on line {}: invalid immediate \'{}\'".format(line_num, immediate))
         return -1
+
+
+main()
