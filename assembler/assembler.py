@@ -30,23 +30,24 @@ def write_file(file_name, file_contents):
 
 def file_lexer(fileLines):
     # the goal is to tokenize each line of the file
-    lexed_tokens = []
+    lexed_contents = []
     line_nums = []
     line_num = 1
     for line in fileLines:
-        lexed_tokens.append(instruction_lexer(line))
+        lexed_contents.append(instruction_lexer(line))
         line_nums.append(line_num)
         line_num += 1
-    return lexed_tokens, line_nums
+    return lexed_contents, line_nums
 
 def instruction_lexer(line):
     # separate each instruction into tokens
     hashtag = line.find("#")
     if hashtag > -1:
-        cleaned_line = line[:hashtag]
-    else:
-        cleaned_line = line
-    tokens = re.split(',| ', cleaned_line)
+        line = line[:hashtag]
+    semicolon = line.find(";")
+    if semicolon > -1:
+        line = line[:semicolon]
+    tokens = re.split(',| |\t', line)
     return [t.strip() for t in tokens if t != '']
 
 def file_parser(tokenized_lines, line_nums):
@@ -57,6 +58,7 @@ def file_parser(tokenized_lines, line_nums):
     while index < len(tokenized_lines):
         if len(tokenized_lines[index]) == 0:
             del tokenized_lines[index]
+            del line_nums[index]
             index -= 1
             continue
 
@@ -66,109 +68,123 @@ def file_parser(tokenized_lines, line_nums):
                 tokenized_lines[index].remove(token)
                 if len(tokenized_lines[index]) == 0:
                     del tokenized_lines[index]
-                num_nops = pad_nops(tokenized_lines, index)
-                index += num_nops
+                    del line_nums[index]
+                num_nops = pad_nops(tokenized_lines, line_nums, index)
+                index += num_nops - 1
                 branch_labels[token[:colon]] = index
         
         index += 1
 
-    for line in tokenized_lines:
-        machine_codes.append(instruction_parser(line, branch_labels, 1))
+    for index in range(len(tokenized_lines)):
+        machine_codes.append(instruction_parser(tokenized_lines[index], branch_labels, line_nums[index]))
         
     return machine_codes
 
-def pad_nops(tokenized_lines, index):
+def pad_nops(tokenized_lines, line_nums, index):
     multiples_of = (2**BRANCH_EXTEND)
     num_nops = multiples_of - (index % multiples_of)
+    next_line_num = line_nums[index]
     if num_nops == multiples_of:
         num_nops = 0
     for i in range(num_nops):
         tokenized_lines.insert(index, ["nop"])
+        line_nums.insert(index, next_line_num)
     return num_nops
 
 # parses the instruction tokens to produce a 9-bit machine code
 def instruction_parser(instruction_tokens, branch_labels, line_num):
     machine_code = list("000000000")
-    op = instruction_tokens[0]
-    args = instruction_tokens[1:]
 
-    if op == "mov":
-        machine_code[0] = '0'
-        machine_code[1:5] = register_code(args[0], line_num)
-        machine_code[5:9] = register_code(args[1], line_num)
-    elif op == "b":
-        machine_code[0:3] = '100'
-        immed = args[0]
-        dollar = immed.find("$")
-        if dollar > -1:
-            immed_int = branch_labels[immed[dollar + 1:]] >> BRANCH_EXTEND
-            immed = str(immed_int)
-        machine_code[3:]  = get_immediate(immed, 0, 2**6-1, 6, line_num)
-    elif op == "li":
-        machine_code[0:3] = '101'
-        machine_code[3:]  = get_immediate(args[0], 0, 2**6-1, 6, line_num)
-    elif op == "lsl":
-        machine_code[0:4] = '1100'
-        if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
-            machine_code[4:6] = register_code(args[0], line_num)[-2:]
-        if len(args) > 1:
-            machine_code[6:]  = get_immediate(args[1], 1, 7, 3, line_num)
+    try:
+        op = instruction_tokens[0]
+        args = instruction_tokens[1:]
+
+        if op == "mov":
+            machine_code[0] = '0'
+            machine_code[1:5] = register_code(args[0], line_num)
+            machine_code[5:9] = register_code(args[1], line_num)
+        elif op == "b":
+            machine_code[0:3] = '100'
+            immed = args[0]
+            dollar = immed.find("$")
+            if dollar > -1:
+                branch_name = immed[dollar + 1:]
+                try:
+                    immed_int = branch_labels[branch_name] >> BRANCH_EXTEND
+                    immed = str(immed_int)
+                except KeyError:
+                    print("Error on line {}: no such branch label \'{}\' exists".format(line_num, branch_name))
+                    immed = "0"
+            machine_code[3:], err = get_immediate(immed, 0, 2**6-1, 6, line_num)
+        elif op == "li":
+            machine_code[0:3] = '101'
+            machine_code[3:], err = get_immediate(args[0], 0, 2**6-1, 6, line_num)
+        elif op == "lsl":
+            machine_code[0:4] = '1100'
+            if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
+                machine_code[4:6] = register_code(args[0], line_num)[-2:]
+            if len(args) > 1:
+                machine_code[6:], err = get_immediate(args[1], 1, 7, 3, line_num)
+            else:
+                machine_code[6:]  = "000"
+        elif op == "lsr":
+            machine_code[0:4] = '1101'
+            if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
+                machine_code[4:6] = register_code(args[0], line_num)[-2:]
+            if len(args) > 1:
+                machine_code[6:], err = get_immediate(args[1], 1, 7, 3, line_num)
+            else:
+                machine_code[6:] = "000"
+        elif op == "lb":
+            machine_code[0:6] = '111100'
+            if check_register(args[0], ['r' + str(i) for i in range(8)], line_num):
+                machine_code[6:] = register_code(args[0], line_num)[-3:]
+        elif op == "sb":
+            machine_code[0:6] = '111101'
+            if check_register(args[0], ['r' + str(i) for i in range(8)], line_num):
+                machine_code[6:] = register_code(args[0], line_num)[-3:]
+        elif op[0:3] == "sbf":
+            machine_code[0:6] = '111011'
+            flags = ["ne", "eq", "lt", "le", "jp"]
+            try:
+                ind = flags.index(op[3:])
+            except ValueError:
+                print("Error on line {}: no such instruction \'{}\' exists".format(line_num, op))
+            machine_code[6:] = format(ind, '03b')
+        elif op == "and":
+            machine_code[0:7] = '1110010'
+            if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
+                machine_code[7:] = register_code(args[0], line_num)[-2:]
+        elif op == "or":
+            machine_code[0:7] = '1110011'
+            if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
+                machine_code[7:] = register_code(args[0], line_num)[-2:]
+        elif op == "not":
+            machine_code[0:7] = '1110100'
+            if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
+                machine_code[7:] = register_code(args[0], line_num)[-2:]
+        elif op == "xor":
+            machine_code[0:7] = '1110101'
+            if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
+                machine_code[7:] = register_code(args[0], line_num)[-2:]
+        elif op == "add":
+            machine_code[0:7] = '1110000'
+            if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
+                machine_code[7:] = register_code(args[0], line_num)[-2:]
+        elif op == "sub":
+            machine_code[0:7] = '1110001'
+            if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
+                machine_code[7:] = register_code(args[0], line_num)[-2:]
+        elif op == "nop":
+            machine_code = '111111110'
+        elif op == "done":
+            machine_code = "111111111"
         else:
-            machine_code[6:]  = "000"
-    elif op == "lsr":
-        machine_code[0:4] = '1101'
-        if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
-            machine_code[4:6] = register_code(args[0], line_num)[-2:]
-        if len(args) > 1:
-            machine_code[6:] = get_immediate(args[1], 1, 7, 3, line_num)
-        else:
-            machine_code[6:] = "000"
-    elif op == "lb":
-        machine_code[0:6] = '111100'
-        if check_register(args[0], ['r' + str(i) for i in range(8)], line_num):
-            machine_code[6:] = register_code(args[0], line_num)[-3:]
-    elif op == "sb":
-        machine_code[0:6] = '111101'
-        if check_register(args[0], ['r' + str(i) for i in range(8)], line_num):
-            machine_code[6:] = register_code(args[0], line_num)[-3:]
-    elif op[0:3] == "sbf":
-        machine_code[0:6] = '111011'
-        flags = ["ne", "eq", "lt", "le", "jp"]
-        try:
-            ind = flags.index(op[3:])
-        except ValueError:
             print("Error on line {}: no such instruction \'{}\' exists".format(line_num, op))
-        machine_code[6:] = format(ind, '03b')
-    elif op == "and":
-        machine_code[0:7] = '1110010'
-        if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
-            machine_code[7:] = register_code(args[0], line_num)[-2:]
-    elif op == "or":
-        machine_code[0:7] = '1110011'
-        if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
-            machine_code[7:] = register_code(args[0], line_num)[-2:]
-    elif op == "not":
-        machine_code[0:7] = '1110100'
-        if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
-            machine_code[7:] = register_code(args[0], line_num)[-2:]
-    elif op == "xor":
-        machine_code[0:7] = '1110101'
-        if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
-            machine_code[7:] = register_code(args[0], line_num)[-2:]
-    elif op == "add":
-        machine_code[0:7] = '1110000'
-        if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
-            machine_code[7:] = register_code(args[0], line_num)[-2:]
-    elif op == "sub":
-        machine_code[0:7] = '1110001'
-        if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
-            machine_code[7:] = register_code(args[0], line_num)[-2:]
-    elif op == "nop":
-        machine_code = '111111110'
-    elif op == "done":
-        machine_code = "111111111"
-    else:
-        print("Error on line {}: no such instruction \'{}\' exists".format(line_num, op))
+    except:
+        print("Error on line {}: invalid instruction".format(line_num))
+        return ""
+
     return ''.join(machine_code)
 
 # checks if the input register is within the list of valid registers
@@ -197,17 +213,20 @@ def register_code(register, line_num):
         return format(15, '04b')
     else:
         print("Error on line {}: no such register \'{}\' exists".format(line_num, register))
-        return -1
+        return "0000"
 
 # checks if the input immediate is within bounds, then formats into binary
 # if not within bounds, throws an error
 def get_immediate(immediate, min, max, size, line_num):
-    immed_int = int(immediate)
+    if immediate.find("x") > -1:
+        immed_int = int(immediate, 16)
+    else:
+        immed_int = int(immediate)
     if immed_int >= min and immed_int <= max:
-        return format(immed_int, '0'+str(size)+'b')
+        return format(immed_int, '0'+str(size)+'b'), 0
     else:
         print("Error on line {}: invalid immediate \'{}\'".format(line_num, immediate))
-        return -1
+        return "", -1
 
 
 main()

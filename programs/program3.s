@@ -49,7 +49,7 @@ L2_conditional:
 
 L2_content:
         # right shift current byte by shift factor
-        mov     rX, 
+        mov     rX, r2
         mov     rY, r5
         lsr     rX
 
@@ -129,7 +129,7 @@ L3_conditional:
         mov     rX, rM
         mov     rY, r5
         sbflt
-        b       $L3_end         # if r5 > 4, end loop 3
+        b       $L1_next         # if r5 > 4, end loop 3
 
 L3_content:
         # rW = bits[i] << r5;

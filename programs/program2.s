@@ -1,5 +1,4 @@
 # TODO: Write loop structure for 15 messages
-    swt                            # Switch register sets
     li  32                          # Load immediate 32 into rM 
     mov r4, rM                     # 
     li  33                          # Load immediate 33 into rM
@@ -10,7 +9,6 @@
 Loop:
     mov r0, r4
     mov r1, r5
-    swt                            # Switch register sets
     lb  r0                         # Load mem[0] into rM
     mov r0, rM                     # ldb r0, mem[0]
     lb  r1                          # Load mem[1] into rM
