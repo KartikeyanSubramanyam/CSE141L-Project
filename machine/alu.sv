@@ -5,14 +5,8 @@ module alu (
     input logic [7:0] in1, in2,
     input logic [4:0] operation,
 
-    // 00101 - C
-
-    // 10001 - S (lsr)
-    // 10000 - S (lsl)
-
-    // input logic 
-
     output logic [7:0] out
+    output logic equal, less;
 );
 
 always_comb begin
@@ -27,5 +21,7 @@ always_comb begin
         5'b00101    : out = in1 - in2;      // sub
         default     : out = 8'b11111111;    // error    
     endcase
+    equal = in1 == in2;
+    less  = in1 <  in2;
 end
 endmodule

@@ -5,15 +5,16 @@ module top_level(
   parameter D = 10;               // program counter width;
   wire[D-1:0] target, 			      // jump 
               prog_ctr;
+  wire[8:0] mach_code;            // machine code
   wire[7:0]   datA,datB,		      // from RegFile
               muxB, muxR,
               mem_data,
               aluOut, muxOut,
               rM;
   wire[4:0] ALUOp;
-  wire[8:0] mach_code;          // machine code
   wire[3:0] rd_addrA, rd_addrB, wr_addr;    // address pointers to reg_file
   wire[2:0] Flag;
+  wire      aluEqual, aluLess;
   
   // Control Signals:
   wire  RegWrite,
@@ -77,7 +78,9 @@ module top_level(
     .operation(ALUOp),
     .in1    (datA),
     .in2    (muxB),                    // input to sc register
-    .out    (aluOut)
+    .out    (aluOut),
+    .equal  (aluEqual),
+    .less   (aluLess)
   );  
 
   dat_mem dm1(
