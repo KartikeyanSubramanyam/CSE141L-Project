@@ -234,17 +234,10 @@ Loop:
     lsl rX, 2
     xor rY
 
-    # q1
+    # q1 and q0
     mov rX, r1
     lsl rX, 6
-    lsr rX, 7
-    lsl rX, 1
-    xor rA
-
-    # q0
-    mov rX, r1
-    lsl rX, 7
-    lsr rX, 7
+    lsr rX, 6
     xor rY
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -313,20 +306,29 @@ Loop:
 
 # bad parity check for p1
 Data_Error:
-    sbfjp
-    b $Done_1_Error
-
-
-Parity_Error:
+    mov rX, rC
+    lsr rX, 1
+    li 8
+    mov rY, rM
+    sbflt 
+    b $MemZeroError
+# mem[0] can be correctly arranged
+MemOneError:
     li 0
     mov rY, rM
-    mov rX, r1
+    mov rX, r0
     lsr rX, 3
     xor rX
-    lsr rX, 1
+    lsr rX, 2
+    lsl rX, 1
     xor rX
     mov rA, rX
-    mov rX, r0
+# now we must fix mem[1]
+    sbfjp
+    b $Done_1_Error
+# mem[1] must be correctly arranged
+MemZeroError:
+    mov rX, r1
     lsr rX, 1
     xor rX
     mov rY, rA
@@ -334,14 +336,42 @@ Parity_Error:
     lsr rY, 4
     lsl rX, 4
     xor rY
-    # rA contains the right 1 ~ 8
+    # rA contains the correct d5 ~ d8
+    mov rA, rY
+    mov rY, rM
+    mov rX, r1
+    lsr rX, 5
+    xor rY
+    # rB contains the right d11 ~ d9
+    # now we must fix mem[0] error
+    mov rB, rY
+
+Parity_Error:
+    li 0
+    mov rY, rM
+    mov rX, r0
+    lsr rX, 3
+    xor rX
+    lsr rX, 2
+    lsl rX, 1
+    xor rX
+    mov rA, rX
+    mov rX, r1
+    lsr rX, 1
+    xor rX
+    mov rY, rA
+    lsl rY, 4
+    lsr rY, 4
+    lsl rX, 4
+    xor rY
+    # rA contains the correct d1 ~ d8
     mov rA, rY
 
     mov rY, rM
-    mov rX, r0
+    mov rX, r1
     lsr rX, 5
     xor rY
-    # rB contains the right 11 ~ 9
+    # rB contains the right d11 ~ d9
     mov rB, rY
     sbfjp
     b $Done_1_Error
