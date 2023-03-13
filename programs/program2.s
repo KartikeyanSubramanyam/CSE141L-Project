@@ -312,7 +312,7 @@ Data_Error:
     mov rY, rM
     sbflt 
     b $MemZeroError
-# mem[0] can be correctly arranged
+# mem[0] can be correctly arranged but mem[1] must be fixed
 MemOneError:
     li 0
     mov rY, rM
@@ -324,9 +324,52 @@ MemOneError:
     xor rX
     mov rA, rX
 # now we must fix mem[1]
+    mov rX, rC
+    lsr rX, 1
+    li 9
+    mov rY, rM
+    sbfeq $Position_9
+    li 10
+    mov rY, rM
+    sbfeq $Position_10
+    li 11
+    mov rY, rM
+    sbfeq $Position_11
+    li 12
+    mov rY, rM
+    sbfeq $Position_12
+    li 13
+    mov rY, rM
+    sbfeq $Position_13
+    li 14
+    mov rY, rM
+    sbfeq $Position_14
+    li 15
+    mov rY, rM
+    sbfeq $Position_15
+
+Position_9:
     sbfjp
     b $Done_1_Error
-# mem[1] must be correctly arranged
+Position_10:
+    sbfjp
+    b $Done_1_Error
+Position_11:
+    sbfjp
+    b $Done_1_Error
+Position_12:
+    sbfjp
+    b $Done_1_Error
+Position_13:
+    sbfjp
+    b $Done_1_Error
+Position_14:
+    sbfjp
+    b $Done_1_Error
+Position_15:
+    sbfjp
+    b $Done_1_Error
+# mem[1] can be correctly arranged but mem[0] must be fixed
 MemZeroError:
     mov rX, r1
     lsr rX, 1
@@ -342,10 +385,35 @@ MemZeroError:
     mov rX, r1
     lsr rX, 5
     xor rY
-    # rB contains the right d11 ~ d9
-    # now we must fix mem[0] error
+    # rB contains the right d9 ~ d11
     mov rB, rY
-
+    # now we must fix mem[0]
+    mov rX, rC
+    lsr rX, 1
+    li 3
+    mov rY, rM
+    sbfeq $Position_3
+    li 5
+    mov rY, rM
+    sbfeq $Position_5
+    li 6
+    mov rY, rM
+    sbfeq $Position_6
+    li 7
+    mov rY, rM
+    sbfeq $Position_7
+Position_3:
+    sbfjp
+    b $Done_1_Error
+Position_5:
+    sbfjp
+    b $Done_1_Error
+Position_6:
+    sbfjp
+    b $Done_1_Error
+Position_7:
+    sbfjp
+    b $Done_1_Error
 Parity_Error:
     li 0
     mov rY, rM
@@ -373,6 +441,7 @@ Parity_Error:
     xor rY
     # rB contains the right d11 ~ d9
     mov rB, rY
+
     sbfjp
     b $Done_1_Error
     
