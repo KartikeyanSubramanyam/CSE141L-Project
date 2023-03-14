@@ -250,8 +250,38 @@ Loop:
     # now rY has s[] which is the result of p[] ^ q[] 
     mov rC, rY
 
-    # ---- up until this should be correct 
+ 
     # rY = rC = 0 0 0 s8 s4 s2 s1 s0
+
+
+    # making output first before checking what is wrong:
+    li 0
+    mov rY, rM
+    mov rX, r0
+    lsr rX, 3
+    xor rX
+    lsr rX, 2
+    lsl rX, 1
+    xor rX
+    mov rA, rX
+    mov rX, r1
+    lsr rX, 1
+    xor rX
+    mov rY, rA
+    lsl rY, 4
+    lsr rY, 4
+    lsl rX, 4
+    xor rY
+    # rA contains the correct d1 ~ d8
+    mov rA, rY
+    li 0
+    mov rY, rM
+    mov rX, r1
+    lsr rX, 5
+    xor rY
+    # rB contains the right d11 ~ d9
+    mov rB, rY
+
 
     # we check if s[] == 0 because if it is theres no error that we can report and we move to the Done branch
     mov rX, rC
@@ -301,147 +331,91 @@ Loop:
     
 # - - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-# at this point we have s[] in rC, r0 and r1 have the input mem[0] and mem[1] respectively
-# rA and rB can be freed
+# at this point we have s[] in rC, rA and rB have the output mem[0] and mem[1] respectively
 
-# bad parity check for p1
 Data_Error:
-    mov rX, rC
-    lsr rX, 1
-    li 8
-    mov rY, rM
-    sbflt 
-    b $MemZeroError
-# mem[0] can be correctly arranged but mem[1] must be fixed
-MemOneError:
-    li 0
-    mov rY, rM
-    mov rX, r0
-    lsr rX, 3
-    xor rX
-    lsr rX, 2
-    lsl rX, 1
-    xor rX
-    mov rA, rX
-# now we must fix mem[1]
-    mov rX, rC
-    lsr rX, 1
-    li 9
-    mov rY, rM
-    sbfeq $Position_9
-    li 10
-    mov rY, rM
-    sbfeq $Position_10
-    li 11
-    mov rY, rM
-    sbfeq $Position_11
-    li 12
-    mov rY, rM
-    sbfeq $Position_12
-    li 13
-    mov rY, rM
-    sbfeq $Position_13
-    li 14
-    mov rY, rM
-    sbfeq $Position_14
-    li 15
-    mov rY, rM
-    sbfeq $Position_15
-
-Position_9:
-    sbfjp
-    b $Done_1_Error
-Position_10:
-    sbfjp
-    b $Done_1_Error
-Position_11:
-    sbfjp
-    b $Done_1_Error
-Position_12:
-    sbfjp
-    b $Done_1_Error
-Position_13:
-    sbfjp
-    b $Done_1_Error
-Position_14:
-    sbfjp
-    b $Done_1_Error
-Position_15:
-    sbfjp
-    b $Done_1_Error
-# mem[1] can be correctly arranged but mem[0] must be fixed
-MemZeroError:
-    mov rX, r1
-    lsr rX, 1
-    xor rX
-    mov rY, rA
-    lsl rY, 4
-    lsr rY, 4
-    lsl rX, 4
-    xor rY
-    # rA contains the correct d5 ~ d8
-    mov rA, rY
-    mov rY, rM
-    mov rX, r1
-    lsr rX, 5
-    xor rY
-    # rB contains the right d9 ~ d11
-    mov rB, rY
-    # now we must fix mem[0]
+    
+    # now we check for subsequent error to flip, flip that bit and return
     mov rX, rC
     lsr rX, 1
     li 3
     mov rY, rM
-    sbfeq $Position_3
+    sbfeq $Position_3_D1
     li 5
     mov rY, rM
-    sbfeq $Position_5
+    sbfeq $Position_5_D2
     li 6
     mov rY, rM
-    sbfeq $Position_6
+    sbfeq $Position_6_D3
     li 7
     mov rY, rM
-    sbfeq $Position_7
-Position_3:
+    sbfeq $Position_7_D4
+    li 9
+    mov rY, rM
+    sbfeq $Position_9_D5
+    li 10
+    mov rY, rM
+    sbfeq $Position_10_D6
+    li 11
+    mov rY, rM
+    sbfeq $Position_11_D7
+    li 12
+    mov rY, rM
+    sbfeq $Position_12_D8
+    li 13
+    mov rY, rM
+    sbfeq $Position_13_D9
+    li 14
+    mov rY, rM
+    sbfeq $Position_14_D10
+    li 15
+    mov rY, rM
+    sbfeq $Position_15_D11
+
+# rA
+Position_3_D1:
     sbfjp
     b $Done_1_Error
-Position_5:
+Position_5_D2:
     sbfjp
     b $Done_1_Error
-Position_6:
+Position_6_D3:
     sbfjp
     b $Done_1_Error
-Position_7:
+Position_7_D4:
     sbfjp
     b $Done_1_Error
-Parity_Error:
+Position_9_D5:
+    mov rX, rA
+    lsr rX, 1
+    not rX
     li 0
     mov rY, rM
-    mov rX, r0
-    lsr rX, 3
-    xor rX
-    lsr rX, 2
-    lsl rX, 1
-    xor rX
-    mov rA, rX
-    mov rX, r1
-    lsr rX, 1
-    xor rX
-    mov rY, rA
-    lsl rY, 4
-    lsr rY, 4
-    lsl rX, 4
-    xor rY
-    # rA contains the correct d1 ~ d8
-    mov rA, rY
 
-    mov rY, rM
-    mov rX, r1
-    lsr rX, 5
-    xor rY
-    # rB contains the right d11 ~ d9
-    mov rB, rY
+    sbfjp
+    b $Done_1_Error
+Position_10_D6:
+    sbfjp
+    b $Done_1_Error
+Position_11_D7:
+    sbfjp
+    b $Done_1_Error
 
+# rB
+Position_12_D8:
+    sbfjp
+    b $Done_1_Error
+Position_13_D9:
+    sbfjp
+    b $Done_1_Error
+Position_14_D10:
+    sbfjp
+    b $Done_1_Error
+Position_15_D11:
+    sbfjp
+    b $Done_1_Error
+    
+Parity_Error:
     sbfjp
     b $Done_1_Error
     
@@ -456,15 +430,16 @@ Done_1_Error:
 
 Done_2_Error:
     li 128
-    mov rB, rM
-    li 0
-    mov rA, 0
+    mov rY, rM
+    mov rX, rB
+    xor rX
+    mov rB, rX
 
 Done:
     # Store output into mem[30:59]
-    mov rM, rB                     # Put rY into rM
-    sb r2                          # Store rM, mem[30]
     mov rM, rA                     # Put rY into rM
+    sb r2                          # Store rM, mem[30]
+    mov rM, rB                     # Put rY into rM
     sb r2                          # Store rM, mem[31]
 Iterate:
     li  2
