@@ -251,10 +251,10 @@ Loop:
     mov rC, rY
 
  
-    # rY = rC = 0 0 0 s8 s4 s2 s1 s0
-
+    # rC = 0 0 0 s8 s4 s2 s1 s0
 
     # making output first before checking what is wrong:
+Forming_Output:
     li 0
     mov rY, rM
     mov rX, r0
@@ -301,7 +301,7 @@ Loop:
     b $Done_2_Error
 
     # since there is an error and s0 is also not 0, we can assume there is a 1 bit error
-    # so we check s1:8 to find which bit to fix
+    # so we check s1~8 to find which bit to fix
     mov rX, rC
     lsr rX, 1
 
@@ -331,7 +331,7 @@ Loop:
     
 # - - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
-# at this point we have s[] in rC, rA and rB have the output mem[0] and mem[1] respectively
+# at this point we have s[] in rC, rA and rB have the output mem[0] and mem[1] with (maybe) the correct D1~11 respectively
 
 Data_Error:
     
