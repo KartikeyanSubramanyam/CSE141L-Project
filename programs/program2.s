@@ -309,25 +309,25 @@ Forming_Output:
     li 1
     mov rY, rM
     sbfeq
-    b $Parity_Error
+    b $Done_1_Error
 
     # bad parity bit p2 check since 2 == 0010
     li 2
     mov rY, rM
     sbfeq
-    b $Parity_Error
+    b $Done_1_Error
 
     # bad parity bit p4 check since 4 == 0100
     li 4
     mov rY, rM
     sbfeq
-    b $Parity_Error
+    b $Done_1_Error
 
     # bad parity bit p8 check since 8 == 1000
     li 8
     mov rY, rM
     sbfeq
-    b $Parity_Error    
+    b $Done_1_Error  
     
 # - - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
@@ -374,48 +374,182 @@ Data_Error:
 
 # rA
 Position_3_D1:
+    mov rX, rA
+    not rX
+    lsl rX, 7
+    lsr rX, 7
+    mov rY, rA
+    lsr rY, 1
+    lsl rY, 1
+    xor rY
+    mov rA, rY
     sbfjp
     b $Done_1_Error
 Position_5_D2:
+    mov rX, rA
+    not rX
+    lsl rX, 6
+    lsr rX, 7
+    lsl rX, 1
+    mov rY, rA
+    lsr rY, 2
+    lsl rY, 2
+    xor rY
+    mov rX, rA
+    lsl rX, 7
+    lsr rX, 7
+    xor rY
+    mov rA, rY
     sbfjp
     b $Done_1_Error
 Position_6_D3:
+    mov rX, rA
+    not rX
+    lsl rX, 5
+    lsr rX, 7
+    lsl rX, 2
+    mov rY, rA
+    lsr rY, 3
+    lsl rY, 3
+    xor rY
+    mov rX, rA
+    lsl rX, 6
+    lsr rX, 6
+    xor rY
+    mov rA, rY
     sbfjp
     b $Done_1_Error
 Position_7_D4:
+    mov rX, rA
+    not rX
+    lsl rX, 4
+    lsr rX, 7
+    lsl rX, 3
+    mov rY, rA
+    lsr rY, 4
+    lsl rY, 4
+    xor rY
+    mov rX, rA
+    lsl rX, 5
+    lsr rX, 5
+    xor rY
+    mov rA, rY
     sbfjp
     b $Done_1_Error
 Position_9_D5:
     mov rX, rA
-    lsr rX, 1
     not rX
-    li 0
-    mov rY, rM
-
+    lsl rX, 3
+    lsr rX, 7
+    lsl rX, 4
+    mov rY, rA
+    lsr rY, 5
+    lsl rY, 5
+    xor rY
+    mov rX, rA
+    lsl rX, 4
+    lsr rX, 4
+    xor rY
+    mov rA, rY
     sbfjp
     b $Done_1_Error
 Position_10_D6:
+    mov rX, rA
+    not rX
+    lsl rX, 2
+    lsr rX, 7
+    lsl rX, 5
+    mov rY, rA
+    lsr rY, 6
+    lsl rY, 6
+    xor rY
+    mov rX, rA
+    lsl rX, 3
+    lsr rX, 3
+    xor rY
+    mov rA, rY
     sbfjp
     b $Done_1_Error
 Position_11_D7:
+    mov rX, rA
+    not rX
+    lsl rX, 1
+    lsr rX, 7
+    lsl rX, 6
+    mov rY, rA
+    lsr rY, 7
+    lsl rY, 7
+    xor rY
+    mov rX, rA
+    lsl rX, 2
+    lsr rX, 2
+    xor rY
+    mov rA, rY
+    sbfjp
+    b $Done_1_Error
+
+Position_12_D8:
+    mov rX, rA
+    not rX
+    lsr rX, 7
+    lsl rX, 7
+    mov rY, rA
+    lsr rY, 8
+    lsl rY, 8
+    xor rY
+    mov rX, rA
+    lsl rX, 1
+    lsr rX, 1
+    xor rY
+    mov rA, rY
     sbfjp
     b $Done_1_Error
 
 # rB
-Position_12_D8:
-    sbfjp
-    b $Done_1_Error
 Position_13_D9:
+    mov rX, rB
+    not rX
+    lsl rX, 7
+    lsr rX, 7
+    mov rY, rB
+    lsr rY, 1
+    lsl rY, 1
+    xor rY
+    mov rB, rY
     sbfjp
     b $Done_1_Error
 Position_14_D10:
+    mov rX, rB
+    not rX
+    lsl rX, 6
+    lsr rX, 7
+    lsl rX, 1
+    mov rY, rB
+    lsr rY, 2
+    lsl rY, 2
+    xor rY
+    mov rX, rB
+    lsl rX, 7
+    lsr rX, 7
+    xor rY
+    mov rB, rY
     sbfjp
     b $Done_1_Error
 Position_15_D11:
-    sbfjp
-    b $Done_1_Error
-    
-Parity_Error:
+    mov rX, rB
+    not rX
+    lsl rX, 5
+    lsr rX, 7
+    lsl rX, 2
+    mov rY, rB
+    lsr rY, 3
+    lsl rY, 3
+    xor rY
+    mov rX, rB
+    lsl rX, 6
+    lsr rX, 6
+    xor rY
+    mov rB, rY
     sbfjp
     b $Done_1_Error
     
