@@ -93,6 +93,7 @@ module top_level(
   );
 
   Branch br_inst(
+    .clk,
     .equal       (aluEqual),
     .less        (aluLess),
     .w_flag      (FlagWrite),

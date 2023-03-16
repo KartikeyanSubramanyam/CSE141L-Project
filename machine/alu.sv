@@ -5,8 +5,8 @@ module alu (
     input logic [7:0] in1, in2,
     input logic [4:0] operation,
 
-    output logic [7:0] out
-    output logic equal, less;
+    output logic [7:0] out,
+    output logic equal, less
 );
 
 always_comb begin
