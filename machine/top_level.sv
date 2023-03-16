@@ -15,6 +15,7 @@ module top_level(
   wire[3:0] rd_addrA, rd_addrB, wr_addr;    // address pointers to reg_file
   wire[2:0] Flag;
   wire      aluEqual, aluLess;
+  wire      absjump_en;
   
   // Control Signals:
   wire  RegWrite,
@@ -29,7 +30,7 @@ module top_level(
   PC #(.D(D)) 					          // D sets program counter width
      pc1 (.reset,
           .clk,
-		      .absjump_en (Branch),
+		      .absjump_en,
 		      .target,
 		      .prog_ctr);
 
@@ -89,6 +90,17 @@ module top_level(
     .wr_en  (MemWrite),                 // stores
     .addr   (muxOut),
     .dat_out(mem_data)
+  );
+
+  Branch br_inst(
+    .equal       (aluEqual),
+    .less        (aluLess),
+    .w_flag      (FlagWrite),
+    .flag_in     (Flag),
+    .branch_instr(Branch),
+    .immediate   (muxOut),
+    .address     (target),
+    .branch      (absjump_en)
   );
 
   assign muxR = MemtoReg ? mem_data : muxOut;

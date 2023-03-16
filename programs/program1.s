@@ -1,14 +1,14 @@
 # TODO: Write loop structure for 15 messages
-    li  0                          # Load immediate 0 into rM 
+    li  0                          # Load immediate 0 into rM
     mov r4, rM                     # 
     li  1                          # Load immediate 1 into rM
     mov r5, rM                     
+    li  30
+    mov r6, rM
 Loop:
-    mov r0, r4
-    mov r1, r5
-    lb  r0                         # Load mem[0] into rM
+    lb  r4                         # Load mem[0] into rM
     mov r0, rM                     # ldb r0, mem[0]
-    lb  r1                          # Load mem[1] into rM
+    lb  r5                         # Load mem[1] into rM
     mov r1, rM                     # ldb r1, mem[1]
     li  0                          # Load 0 into rM
     mov rY, rM                     # Clear out rY   
@@ -176,13 +176,42 @@ Loop:
     lsr rX, 7                      # Shifts for xor with p0
     xor rY                         # XOR rX and rY, put into rY
 
-    # Store output into mem[30:59]
-    mov rM, rY                     # Put rY into rM
-    sb r2                          # Store rM, mem[30]
-    mov rM, rY                     # Put rY into rM
-    sb r3                          # Store rM, mem[31]
+    # save parity bits to another register
+    mov rC, rY
 
-    # TODO will have to fix addressing for storing to make it relative to input memory address
+    # create new bytes padded with parities
+    # lower byte:
+    mov rX, r0
+    
+
+    # higher byte:
+    mov rX, r1
+    lsl rZ, 5
+    mov rX, r0
+    lsr rX, 4
+    lsl rX, 1
+    mov rY, rZ
+    or  rY
+    mov rX, rC
+    lsr rX, 4
+    or  rZ
+    mov rB, rZ
+
+    # --------------------
+    # rY holds the parity bits! need to compute output such that mem[0] and mem[1] are in rA and rB respectively.
+    # Store output into mem[30:59]
+
+    mov rX, r4
+    mov rY, r6
+    add rZ
+    mov r2, rZ
+    mov rX, r5
+    add rZ
+    mov r3, rZ
+    mov rM, rA                     # Put rA into rM
+    sb r2                          # Store rM, mem[30]
+    mov rM, rB                     # Put rB into rM
+    sb r3                          # Store rM, mem[31]
     
 Iterate:
     li  2
@@ -193,6 +222,7 @@ Iterate:
     mov rX, r5
     add rZ              # rX + rY after rX incremented
     mov r5, rZ
+    mov rX, r4
     li  30
     mov rY, rM
     sbflt               # rX < rY then branch

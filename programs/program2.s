@@ -1,17 +1,17 @@
 # TODO: Write loop structure for 15 messages
-    li  32                          # Load immediate 32 into rM 
-    mov r4, rM                     # 
-    li  33                          # Load immediate 33 into rM
-    mov r5, rM                     #
+    li  30                          # Load immediate 32 into rM 
+    mov r4, rM                      # 
+    li  31                          # Load immediate 33 into rM
+    mov r5, rM                      #
+    li  30
+    mov r6, rM
     nop                            # nop in order to match with Branch's power of 4
     nop
     nop
 Loop:
-    mov r0, r4
-    mov r1, r5
-    lb  r0                         # Load mem[0] into rM
+    lb  r4                         # Load mem[0] into rM
     mov r0, rM                     # ldb r0, mem[0]
-    lb  r1                          # Load mem[1] into rM
+    lb  r5                          # Load mem[1] into rM
     mov r1, rM                     # ldb r1, mem[1]
     li  0                          # Load 0 into rM
     mov rY, rM                     # Clear out rY   
@@ -340,37 +340,48 @@ Data_Error:
     lsr rX, 1
     li 3
     mov rY, rM
-    sbfeq $Position_3_D1
+    sbfeq 
+    b $Position_3_D1
     li 5
     mov rY, rM
-    sbfeq $Position_5_D2
+    sbfeq
+    b $Position_5_D2
     li 6
     mov rY, rM
-    sbfeq $Position_6_D3
+    sbfeq
+    b $Position_6_D3
     li 7
     mov rY, rM
-    sbfeq $Position_7_D4
+    sbfeq
+    b $Position_7_D4
     li 9
     mov rY, rM
-    sbfeq $Position_9_D5
+    sbfeq
+    b $Position_9_D5
     li 10
     mov rY, rM
-    sbfeq $Position_10_D6
+    sbfeq
+    b $Position_10_D6
     li 11
     mov rY, rM
-    sbfeq $Position_11_D7
+    sbfeq
+    b $Position_11_D7
     li 12
     mov rY, rM
-    sbfeq $Position_12_D8
+    sbfeq
+    b $Position_12_D8
     li 13
     mov rY, rM
-    sbfeq $Position_13_D9
+    sbfeq
+    b $Position_13_D9
     li 14
     mov rY, rM
-    sbfeq $Position_14_D10
+    sbfeq
+    b $Position_14_D10
     li 15
     mov rY, rM
-    sbfeq $Position_15_D11
+    sbfeq 
+    b $Position_15_D11
 
 # rA
 Position_3_D1:
@@ -494,8 +505,8 @@ Position_12_D8:
     lsr rX, 7
     lsl rX, 7
     mov rY, rA
-    lsr rY, 8
-    lsl rY, 8
+    lsr rY, 4
+    lsr rY, 4
     xor rY
     mov rX, rA
     lsl rX, 1
@@ -554,8 +565,9 @@ Position_15_D11:
     b $Done_1_Error
     
 Done_1_Error:
-    li 64
-    mov rY, rM
+    li 1
+    mov rY, rM                  # loading 1 and moving to the left by 6 in order to get 64
+    lsl rY, 6
     mov rX, rB
     xor rX
     mov rB, rX
@@ -563,18 +575,27 @@ Done_1_Error:
     b $Done
 
 Done_2_Error:
-    li 128
+    li 1
     mov rY, rM
+    lsl rY, 7                   # loading 1 and moving to the left by 7 in order to get 128
     mov rX, rB
     xor rX
     mov rB, rX
 
 Done:
     # Store output into mem[30:59]
+    mov rX, r6
+    mov rY, r4
+    sub rX
+    mov r2, rX
+    mov rX, r6
+    mov rY, r5
+    sub rX
+    mov r3, rX
     mov rM, rA                     # Put rY into rM
     sb r2                          # Store rM, mem[30]
     mov rM, rB                     # Put rY into rM
-    sb r2                          # Store rM, mem[31]
+    sb r3                          # Store rM, mem[31]
 Iterate:
     li  2
     mov rY, rM          # 2
@@ -584,7 +605,8 @@ Iterate:
     mov rX, r5
     add rZ              # rX + rY after rX incremented
     mov r5, rZ
-    li  30
+    mov rX, r4
+    li  60
     mov rY, rM
     sbflt               # rX < rY then branch
     b $Loop
