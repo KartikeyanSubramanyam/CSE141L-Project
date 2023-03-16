@@ -182,25 +182,48 @@ Loop:
     # create new bytes padded with parities
     # lower byte:
     mov rX, r0
+    li  1
+    mov rY, rM
+    or  rZ
+
+    lsr rX, 1
+    lsl rW, 5
+
+    mov rX, rC
+    lsl rX, 4
+    lsr rX, 7
+    lsl rY, 4
+
+    mov rX, rW
+    or  rW
+
+    mov rX, rC
+    lsl rX, 5
+    lsr rY, 4
     
+    mov rX, rW
+    or  rX
+    mov rY, rZ
+    or  rZ
+
+    mov rA, rZ
 
     # higher byte:
     mov rX, r1
     lsl rZ, 5
+
     mov rX, r0
     lsr rX, 4
     lsl rX, 1
     mov rY, rZ
     or  rY
+
     mov rX, rC
     lsr rX, 4
     or  rZ
     mov rB, rZ
 
-    # --------------------
-    # rY holds the parity bits! need to compute output such that mem[0] and mem[1] are in rA and rB respectively.
     # Store output into mem[30:59]
-
     mov rX, r4
     mov rY, r6
     add rZ
