@@ -60,18 +60,24 @@ def file_parser(tokenized_lines, line_nums):
             del tokenized_lines[index]
             del line_nums[index]
             index -= 1
-            continue
+    #     index += 1
 
+    # index = 0
+    # while index < len(tokenized_lines):
         for token in tokenized_lines[index]:
             colon = token.find(":")
             if colon > -1 and len(token) > 1:
                 tokenized_lines[index].remove(token)
+                b_label = False
                 if len(tokenized_lines[index]) == 0:
                     del tokenized_lines[index]
                     del line_nums[index]
+                    b_label = True
                 num_nops = pad_nops(tokenized_lines, line_nums, index)
-                index += num_nops - 1
+                index += num_nops
                 branch_labels[token[:colon]] = index
+                if b_label:
+                    index -= 1
         
         index += 1
 
@@ -175,6 +181,10 @@ def instruction_parser(instruction_tokens, branch_labels, line_num):
             machine_code[0:7] = '1110001'
             if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
                 machine_code[7:] = register_code(args[0], line_num)[-2:]
+        elif op == "xrb":
+            machine_code[0:7] = '1111100'
+            if check_register(args[0], ["rX", "rY", "rZ", "rW"], line_num):
+                machine_code[7:] = register_code(args[0], line_num)[-2:]
         elif op == "nop":
             machine_code = '111111110'
         elif op == "done":
@@ -220,6 +230,8 @@ def register_code(register, line_num):
 def get_immediate(immediate, min, max, size, line_num):
     if immediate.find("x") > -1:
         immed_int = int(immediate, 16)
+    elif immediate.find("b") > -1:
+        immed_int = int(immediate, 2)
     else:
         immed_int = int(immediate)
     if immed_int >= min and immed_int <= max:

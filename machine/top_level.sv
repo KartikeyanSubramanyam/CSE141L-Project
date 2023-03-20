@@ -94,6 +94,7 @@ module top_level(
 
   Branch br_inst(
     .clk,
+    .reset,
     .equal       (aluEqual),
     .less        (aluLess),
     .w_flag      (FlagWrite),

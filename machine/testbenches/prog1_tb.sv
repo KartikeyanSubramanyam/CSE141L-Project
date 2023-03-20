@@ -26,7 +26,7 @@ bit  [15:0] score1, case1;
 top_level DUT(.clk, .reset(req), .done);            // replace "proc" with the name of your top level module
 
 initial begin
-  $readmemb("C:/Users/Sparr/OneDrive/Documents/CSE 141L Project/machine/mach_code.txt",DUT.ir_inst.core);
+  $readmemb("program1.bin",DUT.ir_inst.core);
 
   for(int i=0;i<15;i++)	begin
     d1_in[i] = $random>>4;        // create 15 messages	   '1    '0

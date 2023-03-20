@@ -19,7 +19,8 @@ always_comb begin
         5'b00011    : out = in1 ^ in2;      // xor
         5'b00100    : out = in1 + in2;      // add
         5'b00101    : out = in1 - in2;      // sub
-        default     : out = 8'b11111111;    // error    
+        5'b00110    : out = ^in1;
+        default     : out = 8'b11111111;    // error
     endcase
     equal = in1 == in2;
     less  = in1 <  in2;

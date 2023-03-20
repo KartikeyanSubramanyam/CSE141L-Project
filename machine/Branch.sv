@@ -3,6 +3,7 @@
 
 module Branch (
     input clk,                              // input clock
+    input reset,
     input logic equal, less, w_flag,
     input logic [2:0] flag_in,              // flag bits to rewrite flag status register if 'change_flag' is 1
     input logic branch_instr,               // whether or not current instruction is a branch
@@ -18,6 +19,8 @@ always_ff @(posedge clk) begin
     // Updates flag_register only if the w_flag is triggered
     if (w_flag)
         flag_register <= flag_in;
+    if (reset)
+        flag_register <= 3'b0;
 end
 
 // Checking the flag_register bits; Use equal, less, and branch_instr in order to determine if we branch
@@ -28,14 +31,14 @@ always_comb begin
     branch = 0;
     // Runs if next instruction is a branch instruction
     if (branch_instr) begin
-        branch = flag_register[0];
+        branch = flag_register[2];
 
         // Checks if less bit triggered
         if (flag_register[1] == 1)
             branch |= less;
         
         // Checks if equal bit triggered
-        if (flag_register[2] == 1)
+        if (flag_register[0] == 1)
             branch |= equal;
     end
 end

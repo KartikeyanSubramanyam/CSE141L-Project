@@ -2,3 +2,7 @@ demos/
 *.zip
 test*/
 !testbenches/
+run/
+*.qpf
+*.qws
+db/

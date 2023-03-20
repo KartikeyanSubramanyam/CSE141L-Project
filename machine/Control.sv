@@ -41,6 +41,7 @@ always_comb begin
   else if (instr[8:6] == 'b110) begin // LSL and LSR operations
     WriteAddr = {2'b10, instr[4:3]};       // sets register destination
     ALUSrc = (instr[2:0] == 0) ? 0 : 1;
+    RegWrite = 'b1;                 // writes to register
     case(instr[5])
     'b0:                            // lsl operation
       ALUOp = 'b10000;              // sets ALU op to LSL
@@ -66,7 +67,6 @@ always_comb begin
     endcase
   end
   else if (instr[8:5] == 'b1110 && instr[4:3] == 'b11) begin  // set branch flag operations
-    Branch = 'b1;                   // branch is set here  
     FlagWrite = 'b1;                // Writes Flag
     case(instr[2:0])
     'b000:                          
@@ -99,6 +99,16 @@ always_comb begin
       ALUOp = 'b00011;             // sets to xor operation
     default:                       // ERROR
       ALUOp = 'b11111;             // ERROR, no such operation
+    endcase
+  end
+  else if (instr[8:4] == 'b11111) begin // Extra Computational Operations
+    WriteAddr = {2'b10, instr[1:0]}; // Writes into rX, rY, rZ, or rW  
+    RegWrite = 'b1;                 // writes to register
+    case(instr[3:2])
+    'b00:                          // xor byte operation
+      ALUOp = 'b00110;             // sets to xor byte operation
+    default:
+      ALUOp = 'b11111;
     endcase
   end
 
