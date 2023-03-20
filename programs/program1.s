@@ -6,195 +6,14 @@
     li  30
     mov r6, rM
 Loop:
+    # load message
     lb  r4                         # Load mem[0] into rM
     mov r0, rM                     # ldb r0, mem[0]
     lb  r5                         # Load mem[1] into rM
     mov r1, rM                     # ldb r1, mem[1]
-    li  0                          # Load 0 into rM
-    mov rY, rM                     # Clear out rY   
-    
-    # Calculating for p8, p4, p2, p1, p0
-    
-    # d9
-    mov rX, r0                     # Moves mem[0] into rX                               
-    lsl rX, 7                      # Keep only d9 from rX
-    lsr rX, 3                      # Places the wanted bit at bit 4 for p8
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 3 for p4
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 2                      # Places the wanted bit at bit 1 for p1
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 0 for p0
-    xor rY                         # XOR rX and rY, put into rY
-    
-    # d10
-    mov rX, r0                     # Moves mem[0] into rX
-    lsr rX, 1                      # Shifts 1 to get rid of last bit          
-    lsl rX, 7                      # Keep only d10 from rX
-    lsr rX, 3                      # Places the wanted bit at bit 4 for p8
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 3 for p4
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 2 for p2
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 2                      # Places the wanted bit at bit 0 for p0
-    xor rY                         # XOR rX and rY, put into rY
-    
-    # d11
-    mov rX, r0                     # Moves mem[0] into rX
-    lsr rX, 2                      # Shifts 2 to get rid of last 2 bits          
-    lsl rX, 7                      # Keep only d11 from rX
-    lsr rX, 3                      # Places the wanted bit at bit 4 for p8
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 3 for p4
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 2 for p2
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 1 for p1
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 0 for p0
-    xor rY                         # XOR rX and rY, put into rY
 
-    # d1
-    mov rX, r1                     # Moves mem[1] into rX                               
-    lsl rX, 7                      # Keep only d1 from rX
-    lsr rX, 5                      # Places the wanted bit at bit 2 for p2
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 1 for p1
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 0 for p0
-    xor rY                         # XOR rX and rY, put into rY
-
-    # d2
-    mov rX, r1                     # Moves mem[1] into rX
-    lsr rX, 1                      # Shifts 1 to get rid of last bit                               
-    lsl rX, 7                      # Keep only d2 from rX
-    lsr rX, 4                      # Places the wanted bit at bit 3 for p4
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 2                      # Places the wanted bit at bit 1 for p1
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 0 for p0
-    xor rY                         # XOR rX and rY, put into rY
-
-    # d3
-    mov rX, r1                     # Moves mem[1] into rX
-    lsr rX, 2                      # Shifts 2 to get rid of last 2 bits                              
-    lsl rX, 7                      # Keep only d2 from rX
-    lsr rX, 4                      # Places the wanted bit at bit 3 for p4
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 2 for p2
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 2                      # Places the wanted bit at bit 0 for p0
-    xor rY                         # XOR rX and rY, put into rY 
-    
-    # d4
-    mov rX, r1                     # Moves mem[1] into rX
-    lsr rX, 3                      # Shifts 3 to get rid of last 3 bits                              
-    lsl rX, 7                      # Keep only d2 from rX
-    lsr rX, 4                      # Places the wanted bit at bit 3 for p4
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 2 for p2
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 1 for p1
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 0 for p0
-    xor rY                         # XOR rX and rY, put into rY
-
-    # d5
-    mov rX, r1                     # Moves mem[1] into rX
-    lsr rX, 4                      # Shifts 4 to get rid of last 4 bits                              
-    lsl rX, 7                      # Keep only d2 from rX
-    lsr rX, 3                      # Places the wanted bit at bit 4 for p8
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 3                      # Places the wanted bit at bit 1 for p1
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 0 for p0
-    xor rY                         # XOR rX and rY, put into rY
-
-    # d6
-    mov rX, r1                     # Moves mem[1] into rX
-    lsr rX, 5                      # Shifts 5 to get rid of last 5 bits                              
-    lsl rX, 7                      # Keep only d2 from rX
-    lsr rX, 3                      # Places the wanted bit at bit 4 for p8
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 2                      # Places the wanted bit at bit 2 for p2
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 2                      # Places the wanted bit at bit 0 for p0
-    xor rY                         # XOR rX and rY, put into rY
-
-    # d7
-    mov rX, r1                     # Moves mem[1] into rX
-    lsr rX, 6                      # Shifts 6 to get rid of last 6 bits                              
-    lsl rX, 7                      # Keep only d2 from rX
-    lsr rX, 3                      # Places the wanted bit at bit 4 for p8
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 3 for p4
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 2 for p2
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 1 for p1
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 0 for p0
-    xor rY                         # XOR rX and rY, put into rY
-
-    # d8
-    mov rX, r1                     # Moves mem[1] into rX
-    lsr rX, 7                      # Shifts 7 to get rid of last 7 bits                              
-    lsl rX, 7                      # Keep only d2 from rX
-    lsr rX, 3                      # Places the wanted bit at bit 4 for p8
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 1                      # Places the wanted bit at bit 3 for p4
-    xor rY                         # XOR rX and rY, put into rY
-    lsr rX, 3                      # Places the wanted bit at bit 0 for p0
-    xor rY                         # XOR rX and rY, put into rY
-    
-    # p8
-    mov rX, rY                     # Moves current parity bits into rX
-    lsr rX, 4                      # Gets rid of other parity bits for p8
-    lsl rX, 7                      # Keep only p8 bit
-    lsr rX, 7                      # Shifts for xor with p0
-    xor rY                         # XOR rX and rY, put into rY
-
-    # p4
-    mov rX, rY                     # Moves current parity bits into rX
-    lsr rX, 3                      # Gets rid of other parity bits for p4
-    lsl rX, 7                      # Keep only p4 bit
-    lsr rX, 7                      # Shifts for xor with p0
-    xor rY                         # XOR rX and rY, put into rY
-
-    # p2
-    mov rX, rY                     # Moves current parity bits into rX
-    lsr rX, 2                      # Gets rid of other parity bits for p2
-    lsl rX, 7                      # Keep only p2 bit
-    lsr rX, 7                      # Shifts for xor with p0
-    xor rY                         # XOR rX and rY, put into rY
-
-    # p1
-    mov rX, rY                     # Moves current parity bits into rX
-    lsr rX, 1                      # Gets rid of other parity bits for p1
-    lsl rX, 7                      # Keep only p1 bit
-    lsr rX, 7                      # Shifts for xor with p0
-    xor rY                         # XOR rX and rY, put into rY
-
-    # save parity bits to another register
-    mov rC, rY
-
-    # create new bytes padded with parities
+    # reformat data bits
     # lower byte:
-    mov rX, rC                      # rX has parity bits
-    li  7                           # load 00111
-    mov rY, rM
-    and  rZ                         # extract last 3 parity bits (p2, p1, p0)
-
-    li  8                           # load 01000
-    mov rY, rM
-    and rX                          # extract p4
-    lsl rW, 1                       # shift to correct position
-
-    mov rX, rZ
-    mov rY, rW
-    or  rZ                          # gives us 000(p4)0(p2)(p1)(p0)
-
     mov rX, r0                      # load in lower bytes
     li  1                           # load 0001
     mov rY, rM
@@ -208,10 +27,7 @@ Loop:
     lsl rX, 4                       # shift to correct position
 
     mov rY, rW                      # load d1
-    or  rX                          # gives us (d4)(d3)(d2)0(d1)000
-
-    mov rY, rZ                      # load in parity bits
-    or  rZ                          # gives us (d4)(d3)(d2)(p4)(d1)(p2)(p1)(p0)
+    or  rZ                          # gives us (d4)(d3)(d2)0(d1)000
 
     mov rA, rZ                      # save lower output byte to rA
 
@@ -228,18 +44,98 @@ Loop:
 
     lsr rX, 3                       # shift to correct position, gives us 000(d8)(d7)(d6)(d5)0
     mov rY, rZ                      # load in d11, d10, d9
-    or  rW                          # gives us (d11)(d10)(d9)(d8)(d7)(d6)(d5)0
-
-    mov rX, rC                      # load in parity bits
-    li  16
-    mov rY, rM
-    and rX                          # extract p8
-    lsr rX, 4                       # shift to correct position, gives us 0000000(p8)
-
-    mov rY, rW                      # load in our transformed data bits
-    or  rZ                          # gives us (d11)(d10)(d9)(d8)(d7)(d6)(d5)(p8)
+    or  rZ                          # gives us (d11)(d10)(d9)(d8)(d7)(d6)(d5)0
 
     mov rB, rZ                      # save higher byte in rB
+
+    # Calculating for p8, p4, p2, p1, p0
+    
+    # p8
+    mov rX, rB                      # rX = (d11)(d10)(d9)(d8)(d7)(d6)(d5)0
+    xrb rY                          # p8 = xor of the upper byte
+    or  rZ
+    mov rB, rZ                      # rB = (d11)(d10)(d9)(d8)(d7)(d6)(d5)(p8)
+
+    # p4
+    li  0b1111
+    mov rX, rM
+    lsl rY, 4                       # rY = 0b11110000
+    
+    mov rX, rB                      # rX = (d11)(d10)(d9)(d8)(d7)(d6)(d5)(p8)
+    and rX                          # rX = (d11)(d10)(d9)(d8)0000
+    xrb rW                          # xor byte rX into rW
+
+    mov rX, rA                      # rX = (d4)(d3)(d2)0(d1)000
+    and rX                          # rX = (d4)(d3)(d2)00000
+    xrb rX                          # xor byte rX back into rX
+
+    mov rY, rW
+    xor rX                          # xor the results of both bytes to get p4
+    lsl rY, 4                       # move p4 to the correct position
+
+    mov rX, rA                      # rX = (d4)(d3)(d2)0(d1)000
+    or  rZ
+    mov rA, rZ                      # rA = (d4)(d3)(d2)(p4)(d1)000
+
+    # p2
+    li  0b1100
+    mov rX, rM
+    lsl rX, 4                       # rX = 0b11000000
+    mov rY, rM
+    or  rY                          # rY = 0b11001100
+
+    mov rX, rB                      # rX = (d11)(d10)(d9)(d8)(d7)(d6)(d5)(p8)
+    and rX                          # rX = (d11)(d10)00(d7)(d6)00
+    xrb rW                          # xor byte rX into rW
+
+    mov rX, rA                      # rX = (d4)(d3)(d2)0(d1)000
+    and rX                          # rX = (d4)(d3)00(d1)000
+    xrb rX                          # xor byte rX back into rX
+
+    mov rY, rW
+    xor rX                          # xor the results of both bytes to get p2
+    lsl rY, 2                       # move p2 to the correct position
+
+    mov rX, rA                      # rX = (d4)(d3)(d2)(p4)(d1)000
+    or  rZ
+    mov rA, rZ                      # rA = (d4)(d3)(d2)(p4)(d1)(p2)00
+
+    # p1
+    li  0b1010
+    mov rX, rM
+    lsl rX, 4                       # rX = 0b10100000
+    mov rY, rM
+    or  rY                          # rY = 0b10101010
+
+    mov rX, rB                      # rX = (d11)(d10)(d9)(d8)(d7)(d6)(d5)(p8)
+    and rX                          # rX = (d11)0(d9)0(d7)0(d5)0
+    xrb rW                          # xor byte rX into rW
+
+    mov rX, rA                      # rX = (d4)(d3)(d2)(p4)(d1)(p2)00
+    and rX                          # rX = (d4)0(d2)0(d1)000
+    xrb rX                          # xor byte rX back into rX
+
+    mov rY, rW
+    xor rX                          # xor the results of both bytes to get p1
+    lsl rY, 1                       # move p1 to the correct position
+
+    mov rX, rA                      # rX = (d4)(d3)(d2)(p4)(d1)(p2)00
+    or  rZ
+    mov rA, rZ                      # rA = (d4)(d3)(d2)(p4)(d1)(p2)(p1)0
+
+    # p0
+    mov rX, rB                      # rX = (d11)(d10)(d9)(d8)(d7)(d6)(d5)(p8)
+    xrb rW                          # xor byte rX into rW
+
+    mov rX, rA                      # rX = (d4)(d3)(d2)(p4)(d1)(p2)(p1)0
+    xrb rX                          # xor byte rX back into rX
+
+    mov rY, rW
+    xor rY                          # xor the results of both bytes to get p0
+
+    mov rX, rA                      # rX = (d4)(d3)(d2)(p4)(d1)(p2)(p1)0
+    or  rZ
+    mov rA, rZ                      # rA = (d4)(d3)(d2)(p4)(d1)(p2)(p1)(p0)
 
     # Store output into mem[30:59]
     mov rX, r4                      # get input address for lower byte
