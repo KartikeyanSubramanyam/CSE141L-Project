@@ -181,60 +181,81 @@ Loop:
 
     # create new bytes padded with parities
     # lower byte:
-    mov rX, r0
-    li  1
+    mov rX, rC                      # rX has parity bits
+    li  7                           # load 00111
     mov rY, rM
-    or  rZ
+    and  rZ                         # extract last 3 parity bits (p2, p1, p0)
 
-    lsr rX, 1
-    lsl rW, 5
+    li  8                           # load 01000
+    mov rY, rM
+    and rX                          # extract p4
+    lsl rW, 1                       # shift to correct position
 
-    mov rX, rC
-    lsl rX, 4
-    lsr rX, 7
-    lsl rY, 4
+    mov rX, rZ
+    mov rY, rW
+    or  rZ                          # gives us 000(p4)0(p2)(p1)(p0)
 
-    mov rX, rW
-    or  rW
+    mov rX, r0                      # load in lower bytes
+    li  1                           # load 0001
+    mov rY, rM
+    and rX                          # extract d1
+    lsl rW, 3                       # shift to correct position
 
-    mov rX, rC
-    lsl rX, 5
-    lsr rY, 4
-    
-    mov rX, rW
-    or  rX
-    mov rY, rZ
-    or  rZ
+    mov rX, r0                      # reload in lower bytes
+    li  14                          # load 1110
+    mov rY, rM
+    and rX                          # extract d4, d3, d2
+    lsl rX, 4                       # shift to correct position
 
-    mov rA, rZ
+    mov rY, rW                      # load d1
+    or  rX                          # gives us (d4)(d3)(d2)0(d1)000
+
+    mov rY, rZ                      # load in parity bits
+    or  rZ                          # gives us (d4)(d3)(d2)(p4)(d1)(p2)(p1)(p0)
+
+    mov rA, rZ                      # save lower output byte to rA
 
     # higher byte:
-    mov rX, r1
-    lsl rZ, 5
+    mov rX, r1                      # load in higher byte
+    lsl rZ, 5                       # shift to correct position, gives us (d11)(d10)(d9)00000
 
-    mov rX, r0
-    lsr rX, 4
-    lsl rX, 1
-    mov rY, rZ
-    or  rY
+    li  0xf                         # load in 1111
+    mov rX, rM
+    lsl rY, 4                       # immediate is now 11110000
 
-    mov rX, rC
-    lsr rX, 4
-    or  rZ
-    mov rB, rZ
+    mov rX, r0                      # load in lower byte
+    and  rX                         # extract d8, d7, d6, d5
+
+    lsr rX, 3                       # shift to correct position, gives us 000(d8)(d7)(d6)(d5)0
+    mov rY, rZ                      # load in d11, d10, d9
+    or  rW                          # gives us (d11)(d10)(d9)(d8)(d7)(d6)(d5)0
+
+    mov rX, rC                      # load in parity bits
+    li  16
+    mov rY, rM
+    and rX                          # extract p8
+    lsr rX, 4                       # shift to correct position, gives us 0000000(p8)
+
+    mov rY, rW                      # load in our transformed data bits
+    or  rZ                          # gives us (d11)(d10)(d9)(d8)(d7)(d6)(d5)(p8)
+
+    mov rB, rZ                      # save higher byte in rB
 
     # Store output into mem[30:59]
-    mov rX, r4
+    mov rX, r4                      # get input address for lower byte
     mov rY, r6
-    add rZ
-    mov r2, rZ
-    mov rX, r5
-    add rZ
-    mov r3, rZ
+    add rZ                          # get input address + 30 = output address
+    mov r2, rZ                      # r2 = output address
+
+    mov rX, r5                      # get input address for higher byte
+    add rZ                          # get input address + 30 = output address
+    mov r3, rZ                      # r3 = output address
+
     mov rM, rA                     # Put rA into rM
-    sb r2                          # Store rM, mem[30]
+    sb r2                          # Store rM, mem[30] (lower byte)
+
     mov rM, rB                     # Put rB into rM
-    sb r3                          # Store rM, mem[31]
+    sb r3                          # Store rM, mem[31] (higher byte)
     
 Iterate:
     li  2
