@@ -99,7 +99,7 @@ module top_level(
     .w_flag      (FlagWrite),
     .flag_in     (Flag),
     .branch_instr(Branch),
-    .immediate   (muxOut),
+    .immediate   (muxOut[5:0]),
     .address     (target),
     .branch      (absjump_en)
   );
