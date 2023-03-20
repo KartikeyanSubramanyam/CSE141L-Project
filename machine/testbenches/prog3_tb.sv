@@ -20,16 +20,17 @@ logic[  7:0] mat_str[32];      // message string parsed into bytes
 top_level DUT(.clk, .reset(req), .done);	               // replace "proc" with the name of your top level module
 
 initial begin
-// program 3
-// pattern we are looking for; experiment w/ various values
-  pat = {5'b0000,3'b000};//{5'b10101,3'b000};//{$random,3'b000};
+  // program 3
+  $readmemb("program3.bin",DUT.ir_inst.core);
+  // pattern we are looking for; experiment w/ various values
+  pat = $urandom(255); // 5'b10101  // 5'b00000
   str2 = 0;
-  DUT.dm1.core[32] = pat;
+  DUT.dm1.core[32] = {pat, 3'b000};
+  // search field; experiment w/ various values
   for(int i=0; i<32; i++) begin
-// search field; experiment w/ various vales
-    mat_str[i] = 8'b00000000;//8'b01010101;// $random;
-	DUT.dm1.core[i] = mat_str[i];   
-	str2 = (str2<<8)+mat_str[i];
+    mat_str[i] = $urandom; // 8b'01010101 // 8b'00000000
+	  DUT.dm1.core[i] = mat_str[i];   
+	  str2 = (str2<<8)+mat_str[i];
   end
   ctb = 0;
   for(int j=0; j<32; j++) begin

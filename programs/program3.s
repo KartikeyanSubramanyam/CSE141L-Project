@@ -37,14 +37,14 @@ L1_content:
 
 L2_setup:
         # load loop 2 index into r5
-        li      3
-        mov     r5, rM          # load 3 into r5 (the shift factor for every loop)
+        li      0
+        mov     r5, rM          # load 0 into r5 (the shift factor for every loop)
 
 L2_conditional:
         mov     rY, r5
-        li      0
+        li      4
         mov     rX, rM
-        sbfle                   # check if 0 <= r5, yes then end loop 2
+        sbfle                   # check if r5 >= 4, yes then end loop 2
         b       $L2_end
 
 L2_content:
@@ -52,6 +52,10 @@ L2_content:
         mov     rX, r2
         mov     rY, r5
         lsr     rX
+
+        li      0b11111
+        mov     rY, rM
+        and     rX
 
         # when there is no match, branch to L2_next
         mov     rY, r0
@@ -70,7 +74,7 @@ L2_next:
         mov     rX, r5
         li      1
         mov     rY, rM
-        sub     rZ
+        add     rZ
         mov     r5, rZ
 
         sbfjp
@@ -104,7 +108,7 @@ L2_end:
 not_last_byte_check:
         # check if the byte index is not the last;
         # otherwise, go to the next iteration of loop 1
-        mov     rY, r7
+        mov     rY, r1
         li      31
         mov     rX, rM
         sbfle

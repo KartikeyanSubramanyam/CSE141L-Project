@@ -31,15 +31,14 @@ always_comb begin
     branch = 0;
     // Runs if next instruction is a branch instruction
     if (branch_instr) begin
-        branch = flag_register[2];
-
-        // Checks if less bit triggered
-        if (flag_register[1] == 1)
-            branch |= less;
-        
-        // Checks if equal bit triggered
-        if (flag_register[0] == 1)
-            branch |= equal;
+        branch = 1'b1;
+        case (flag_register)
+            3'b100: branch = 1'b1;
+            3'b000: branch = !equal;
+            3'b001: branch = equal;
+            3'b010: branch = less;
+            3'b011: branch = less | equal;
+        endcase
     end
 end
 

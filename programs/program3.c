@@ -10,7 +10,7 @@ int main(int num) {
     for (int i = 0; i < 32; i++) {
         int found = 0;
         // loop 2
-        for (int j = 3; j >= 0; j--) {
+        for (int j = 0; j < 4; j++) {
             char c = bits[i] >> j;
             if (c == check) {
                 matchCount++;
