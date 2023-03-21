@@ -23,12 +23,12 @@ initial begin
   // program 3
   $readmemb("program3.bin",DUT.ir_inst.core);
   // pattern we are looking for; experiment w/ various values
-  pat = $urandom(255); // 5'b10101  // 5'b00000
+  pat = $random; // 5'b10101  // 5'b00000
   str2 = 0;
   DUT.dm1.core[32] = {pat, 3'b000};
   // search field; experiment w/ various values
   for(int i=0; i<32; i++) begin
-    mat_str[i] = $urandom; // 8b'01010101 // 8b'00000000
+    mat_str[i] = $random; // 8b'01010101 // 8b'00000000
 	  DUT.dm1.core[i] = mat_str[i];   
 	  str2 = (str2<<8)+mat_str[i];
   end

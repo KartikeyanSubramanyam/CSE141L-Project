@@ -35,9 +35,10 @@ bit  [15:0] score2, case2;
 top_level DUT(.clk, .reset(req), .done);	 // replace "top_level" with the name of your top level module
 
 initial begin
+  $readmemb("program2.bin",DUT.ir_inst.core);
 // generate parity from random 11-bit messages 
   for(int i=0; i<15; i++) begin
-	d2_in[i] = $random;
+	  d2_in[i] = $random;
     p8 = ^d2_in[i][11:5];
     p4 = (^d2_in[i][11:8])^(^d2_in[i][4:2]); 
     p2 = d2_in[i][11]^d2_in[i][10]^d2_in[i][7]^d2_in[i][6]^d2_in[i][4]^d2_in[i][3]^d2_in[i][1];
@@ -50,9 +51,9 @@ initial begin
 // flip second bit about 25% of the time (flip2<16)		// 00_0010     1010
 // if flip2[5:4]!=0, flip2 will have no effect, and we'll have a one-bit flip
     flip2[i] = $random;	   // 'b0;
-	d2_bad[i] = d2_bad1[i] ^ (1'b1<<flip2[i]);
+	  d2_bad[i] = d2_bad1[i] ^ (1'b1<<flip2[i]);
 // if flip2[5:4]==0 && flip2[3:0]==flip, then flip2 undoes flip, so no error
-	DUT.dm1.core[31+2*i] = {d2_bad[i][15:8]};
+	  DUT.dm1.core[31+2*i] = {d2_bad[i][15:8]};
     DUT.dm1.core[30+2*i] = {d2_bad[i][ 7:0]};
   end
   #10ns req   = 1;
