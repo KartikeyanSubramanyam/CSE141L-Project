@@ -1,6 +1,6 @@
 // CSE141L  
 // test bench for program 3
-module prog3_tb();
+module prog3_tb2();
 
 bit   clk   ,                 // clock source -- drives DUT input of same name
 	  req   ;	             // req -- start next program -- drives DUT input
